@@ -1,0 +1,10 @@
+{
+  "trailingComma": "es5",
+  "useTabs": true,
+  "tabWidth": 4,
+  "bracketSpacing": true,
+  "semi": true,
+  "singleQuote": false,
+  "printWidth": 100,
+  "plugins": ["prettier-plugin-tailwindcss"]
+}
