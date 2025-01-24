@@ -1,7 +1,7 @@
 export default function EditClipInfo() {
     return (
         <div>
-            <h1>Edit Video</h1>
+            <h1>Edit Clip</h1>
             <form>
                 <label htmlFor="title">Title</label>
                 <input type="text" id="title" name="title" />

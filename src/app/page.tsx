@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
     <h1>Main</h1>
-    <Link href="/add-clip" className="bg-gray-500 text-white px-4 py-2 rounded">Add Video</Link>
+    <Link href="/add-clip" className="bg-gray-500 text-white px-4 py-2 rounded">Add Clip</Link>
     <VideoList />
     </>
   );

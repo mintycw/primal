@@ -1,7 +1,7 @@
 export default function AddClip() {
   return (
     <div>
-      <h1>Add Video</h1>
+      <h1>Add Clip</h1>
       <form>
         <label htmlFor="title">Title</label>
         <input type="text" id="title" name="title" />
