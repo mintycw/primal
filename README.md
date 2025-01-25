@@ -1,6 +1,7 @@
 ## Getting Started
 
 Create a .env file in the root directory:
+
 ```enviromment
 MONGODB_URI=
 ```

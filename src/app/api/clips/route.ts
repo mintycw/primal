@@ -47,8 +47,7 @@ export async function DELETE(req: Request) {
 		if (!clip) {
 			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
 		}
-		return NextResponse.json({message: "Clip deleted"}, { status: 200 });
-
+		return NextResponse.json({ message: "Clip deleted" }, { status: 200 });
 	} catch (error: any) {
 		console.error("Error deleting clip:", error);
 		return NextResponse.json({ error: "Failed to delete clip" }, { status: 500 });

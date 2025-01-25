@@ -4,33 +4,33 @@ import Navbar from "../components/partials/Navbar";
 import "../styles/globals.css";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+	variable: "--font-geist-sans",
+	subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+	variable: "--font-geist-mono",
+	subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Primal",
-  description: "Share your clips with the world",
+	title: "Primal",
+	description: "Share your clips with the world",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <header><Navbar /></header>
-        <main>{children}</main>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+				<header>
+					<Navbar />
+				</header>
+				<main>{children}</main>
+			</body>
+		</html>
+	);
 }
