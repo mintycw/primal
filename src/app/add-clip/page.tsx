@@ -1,13 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AddClip() {
 	const [title, setTitle] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
 
+	const router = useRouter();
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		if (!title || !description) {
+			alert("Both title and description are required");
+			return;
+		}
 
 		const newClip = {
 			title,
@@ -24,7 +32,9 @@ export default function AddClip() {
 				body: JSON.stringify(newClip),
 			});
 
-			if (!res.ok) {
+			if (res.ok) {
+				router.push("/");
+			} else {
 				throw new Error("Failed to create clip");
 			}
 

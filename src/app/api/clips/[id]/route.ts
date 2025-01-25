@@ -35,3 +35,19 @@ export async function PUT(req: Request, { params }: Params) {
 		return NextResponse.json({ error: "Failed to update clip" }, { status: 500 });
 	}
 }
+
+// Specific clip fetch
+export async function GET(req: Request, { params }: Params) {
+	try {
+		await connectToDatabase();
+		const id = params.id;
+		const clip = await Clip.find().findOne({ _id: id });
+
+		console.log("Clip fetched:", clip);
+
+		return NextResponse.json({ clip }, { status: 200 });
+	} catch (error: any) {
+		console.error(error);
+		return NextResponse.json({ error: "Failed to fetch clip" }, { status: 500 });
+	}
+}

@@ -1,16 +1,76 @@
-export default function EditClipInfo() {
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+interface EditClipProps {
+	id: string;
+	title: string;
+	description: string;
+}
+
+export default function EditClipInfo({ id, title, description }: EditClipProps) {
+	const [newTitle, setNewTitle] = useState(title);
+	const [newDescription, setNewDescription] = useState(description);
+	const router = useRouter();
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (!newTitle || !newDescription) {
+			alert("Both title and description are required");
+			return;
+		}
+
+		const editClip = {
+			newTitle,
+			newDescription,
+		};
+
+		try {
+			const res = await fetch(`http://localhost:3000/api/clips/${id}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(editClip),
+			});
+
+			if (res.ok) {
+				router.push("/");
+			} else {
+				throw new Error("Failed to update clip");
+			}
+
+			const data = await res.json();
+			console.log("Clip updated:", data);
+		} catch (error) {
+			console.error("Error updating clip:", error);
+		}
+	};
+
 	return (
-		<div>
-			<h1>Edit Clip</h1>
-			<form>
-				<label htmlFor="title">Title</label>
-				<input type="text" id="title" name="title" />
-				<label htmlFor="description">Description</label>
-				<input type="text" id="description" name="description" />
-				{/* <label htmlFor="video">Video</label>
-                <input type="file" id="video" name="video" /> */}
-				<button>Update Clip</button>
-			</form>
-		</div>
+		<form onSubmit={handleSubmit}>
+			<div>
+				<label htmlFor="title">Title:</label>
+				<input
+					id="title"
+					type="text"
+					value={newTitle}
+					onChange={(e) => setNewTitle(e.target.value)}
+					required
+				/>
+			</div>
+			<div>
+				<label htmlFor="description">Description:</label>
+				<textarea
+					id="description"
+					value={newDescription}
+					onChange={(e) => setNewDescription(e.target.value)}
+					required
+				/>
+			</div>
+			<button type="submit">Edit Clip</button>
+		</form>
 	);
 }
