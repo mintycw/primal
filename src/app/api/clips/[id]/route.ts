@@ -12,7 +12,11 @@ export async function PUT(req: Request, { params }: Params) {
 	try {
 		await connectToDatabase();
 		const url = new URL(req.url);
-		const id = params.id; // maybe different solution needed
+		// const id = params.id; // maybe different solution needed
+
+		const { id } = params;
+
+		console.log("PUT ID:", id);
 
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });

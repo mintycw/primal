@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface EditClipProps {
 	id: string;
@@ -13,6 +13,10 @@ export default function EditClipInfo({ id, title, description }: EditClipProps) 
 	const [newTitle, setNewTitle] = useState(title);
 	const [newDescription, setNewDescription] = useState(description);
 	const router = useRouter();
+
+	useEffect(() => {
+		console.log(id, title, description);
+	}, [id, title, description]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -26,7 +30,6 @@ export default function EditClipInfo({ id, title, description }: EditClipProps) 
 			newTitle,
 			newDescription,
 		};
-
 		try {
 			const res = await fetch(`http://localhost:3000/api/clips/${id}`, {
 				method: "PUT",

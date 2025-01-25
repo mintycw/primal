@@ -24,7 +24,7 @@ const getClips = async (): Promise<Clip[]> => {
 	}
 };
 
-export default async function VideoList() {
+export default async function ClipList() {
 	const clips = await getClips();
 
 	return (
