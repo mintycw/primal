@@ -1,16 +1,62 @@
+"use client";
+
+import React, { useState } from "react";
+
 export default function AddClip() {
-  return (
-    <div>
-      <h1>Add Clip</h1>
-      <form>
-        <label htmlFor="title">Title</label>
-        <input type="text" id="title" name="title" />
-        <label htmlFor="description">Description</label>
-        <input type="text" id="description" name="description" />
-        <label htmlFor="video">Video</label>
-        <input type="file" id="video" name="video" />
-        <button>Submit</button>
-      </form>
-    </div>
-  );
+	const [title, setTitle] = useState<string>("");
+	const [description, setDescription] = useState<string>("");
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		const newClip = {
+			title,
+			description,
+			createdAt: new Date().toISOString(),
+		};
+
+		try {
+			const res = await fetch("http://localhost:3000/api/clips", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(newClip),
+			});
+
+			if (!res.ok) {
+				throw new Error("Failed to create clip");
+			}
+
+			const data = await res.json();
+			console.log("Clip created:", data);
+		} catch (error) {
+			console.error("Error creating clip:", error);
+		}
+	};
+
+	return (
+		<form onSubmit={handleSubmit}>
+			<div>
+				<label htmlFor="title">Title:</label>
+				<input
+					id="title"
+					type="text"
+					value={title}
+					onChange={(e) => setTitle(e.target.value)}
+					required
+				/>
+			</div>
+			<div>
+				<label htmlFor="description">Description:</label>
+				<textarea
+					id="description"
+					value={description}
+					onChange={(e) => setDescription(e.target.value)}
+					required
+				/>
+			</div>
+			<button type="submit">Create Clip</button>
+		</form>
+	);
 }
