@@ -4,6 +4,11 @@ Create a .env file in the root directory:
 
 ```enviromment
 MONGODB_URI=
+MINIO_ENDPOINT=
+MINIO_BUCKET=
+MINIO_REGION=
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
 ```
 
 Run the development server:
