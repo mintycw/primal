@@ -6,39 +6,58 @@ import { useRouter } from "next/navigation";
 export default function AddClip() {
 	const [title, setTitle] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
+	const [content, setContent] = useState<File | null>(null);
 
 	const router = useRouter();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!title || !description) {
-			alert("Both title and description are required");
+		if (!title || !description || !content) {
+			alert("All fields are required");
+			return;
+		}
+		if (content.size > 1024 * 1024 * 1024) {
+			// 1 GB size limit
+			alert("File size exceeds the limit of 1 GB. Consider shortening the video.");
 			return;
 		}
 
-		const newClip = {
-			title,
-			description,
-			createdAt: new Date().toISOString(),
-		};
+		const formData = new FormData();
+		formData.append("title", title);
+		formData.append("description", description);
+		formData.append("content", content);
+		formData.append("createdAt", new Date().toISOString());
 
 		try {
 			const res = await fetch("http://localhost:3000/api/clips", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(newClip),
+				body: formData,
 			});
 
-			if (res.ok) {
-				router.push("/");
-			} else {
+			if (!res.ok) {
 				throw new Error("Failed to create clip");
 			}
 
 			const data = await res.json();
+			const uploadUrl = data.uploadUrl;
+
+			// Upload the video to the signed URL
+			const uploadRes = await fetch(uploadUrl, {
+				method: "PUT",
+				headers: {
+					"Content-Type": content.type,
+				},
+				body: content, // Upload the file content
+			});
+
+			if (uploadRes.ok) {
+				// upload successful
+				router.push("/");
+			} else {
+				throw new Error("Failed to upload video to bulk database");
+			}
+
 			console.log("Clip created:", data);
 		} catch (error) {
 			console.error("Error creating clip:", error);
@@ -63,6 +82,22 @@ export default function AddClip() {
 					id="description"
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
+					required
+				/>
+			</div>
+			<div>
+				<label htmlFor="upload">Upload Clip:</label>
+				<input
+					type="file"
+					id="upload"
+					accept="video/*"
+					onChange={(e) => {
+						if (e.target.files && e.target.files[0]) {
+							const file = e.target.files[0];
+							console.log("Selected file:", file); //debug
+							setContent(file); // Store the selected file
+						}
+					}}
 					required
 				/>
 			</div>

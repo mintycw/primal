@@ -13,6 +13,7 @@
 		"@aws-sdk/client-s3": "^3.735.0",
 		"@aws-sdk/s3-request-presigner": "^3.735.0",
 		"dotenv": "^16.4.7",
+		"formidable": "^3.5.2",
 		"mongoose": "^8.9.5",
 		"next": "15.1.6",
 		"react": "^19.0.0",
@@ -20,6 +21,7 @@
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
+		"@types/formidable": "^3.4.5",
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",

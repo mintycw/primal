@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IClip extends Document {
 	title: string;
 	description: string;
-	content?: string;
+	content: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -20,6 +20,7 @@ const ClipSchema = new Schema<IClip>(
 		},
 		content: {
 			type: String,
+			required: true,
 		},
 	},
 	{

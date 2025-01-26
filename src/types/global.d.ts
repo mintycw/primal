@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { File } from "multer";
+import { IncomingMessage } from "http";
 
 declare global {
 	var mongoose: {
