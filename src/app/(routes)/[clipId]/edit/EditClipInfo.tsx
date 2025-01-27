@@ -14,10 +14,6 @@ export default function EditClipInfo({ id, title, description }: EditClipProps) 
 	const [newDescription, setNewDescription] = useState(description);
 	const router = useRouter();
 
-	useEffect(() => {
-		console.log(id, title, description);
-	}, [id, title, description]);
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -31,7 +27,7 @@ export default function EditClipInfo({ id, title, description }: EditClipProps) 
 			newDescription,
 		};
 		try {
-			const res = await fetch(`http://localhost:3000/api/clips/${id}`, {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips/${id}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",

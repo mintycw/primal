@@ -24,7 +24,7 @@ export default function AddClip() {
 		};
 
 		try {
-			const res = await fetch("http://localhost:3000/api/clips", {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
