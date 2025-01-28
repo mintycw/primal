@@ -55,6 +55,8 @@ export default function AddClip() {
 				// upload successful
 				router.push("/");
 			} else {
+				const errorText = await uploadRes.text();
+				console.error("Upload response error:", uploadRes.status, errorText);
 				throw new Error("Failed to upload video to bulk database");
 			}
 
@@ -94,8 +96,7 @@ export default function AddClip() {
 					onChange={(e) => {
 						if (e.target.files && e.target.files[0]) {
 							const file = e.target.files[0];
-							console.log("Selected file:", file); //debug
-							setContent(file); // Store the selected file
+							setContent(file);
 						}
 					}}
 					required
