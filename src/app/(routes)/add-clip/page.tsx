@@ -2,12 +2,17 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { postClip } from "@/lib/clips/postClip";
+import { TNewClip } from "@/types/clip";
 
 export default function AddClip() {
+	const router = useRouter();
+
 	const [title, setTitle] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
 
-	const router = useRouter();
+	const [loading, setLoading] = useState<boolean>(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -17,32 +22,20 @@ export default function AddClip() {
 			return;
 		}
 
-		const newClip = {
-			title,
-			description,
-			createdAt: new Date().toISOString(),
-		};
+		const newClip: TNewClip = { title, description };
 
-		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(newClip),
-			});
+		setLoading(true);
+		setError(null);
 
-			if (res.ok) {
-				router.push("/");
-			} else {
-				throw new Error("Failed to create clip");
-			}
+		const createdClip = await postClip(newClip);
 
-			const data = await res.json();
-			console.log("Clip created:", data);
-		} catch (error) {
-			console.error("Error creating clip:", error);
+		if (!createdClip) {
+			setError("Failed to create clip. Please try again.");
+		} else {
+			router.push(`/${createdClip._id}`);
 		}
+
+		setLoading(false);
 	};
 
 	return (
@@ -66,7 +59,10 @@ export default function AddClip() {
 					required
 				/>
 			</div>
-			<button type="submit">Create Clip</button>
+			{error && <p className="text-red-500">{error}</p>}
+			<button type="submit" disabled={loading}>
+				{loading ? "Creating..." : "Create Clip"}
+			</button>
 		</form>
 	);
 }

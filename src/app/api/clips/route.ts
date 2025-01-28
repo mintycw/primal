@@ -8,8 +8,6 @@ export async function GET() {
 
 		const clips = await Clip.find().sort({ createdAt: -1 });
 
-		console.log("Clips fetched:", clips);
-
 		return NextResponse.json(clips);
 	} catch (error: any) {
 		console.error(error);

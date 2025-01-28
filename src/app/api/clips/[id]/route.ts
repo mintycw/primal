@@ -6,15 +6,13 @@ import { RouteParams } from "@/types/param";
 export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
-		const { id } = params;
-
-		console.log("PUT ID:", id);
+		const { id } = await params;
 
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
 
-		const { newTitle: title, newDescription: description } = await req.json();
+		const { title, description } = await req.json();
 		if (!title || !description) {
 			return NextResponse.json({ error: "Invalid data provided" }, { status: 400 });
 		}
@@ -25,7 +23,7 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 		}
 
 		await Clip.findByIdAndUpdate(id, { title, description });
-		return NextResponse.json({ message: "Clip information updated." }, { status: 200 });
+		return NextResponse.json(clip, { status: 200 });
 	} catch (error: any) {
 		console.error("Error updating clip:", error);
 		return NextResponse.json({ error: "Failed to update clip" }, { status: 500 });
@@ -36,10 +34,8 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
-		const { id } = params;
+		const { id } = await params;
 		const clip = await Clip.find().findOne({ _id: id });
-
-		console.log("Clip fetched:", clip);
 
 		return NextResponse.json({ clip }, { status: 200 });
 	} catch (error: any) {
@@ -51,7 +47,7 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 export async function DELETE(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
-		const { id } = params;
+		const { id } = await params;
 
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });

@@ -4,7 +4,7 @@ import { RouteParams } from "@/types/param";
 import ClipDetails from "./ClipDetails";
 
 export default async function Clip({ params }: RouteParams<{ clipId: string }>) {
-	const { clipId } = params;
+	const { clipId } = await params;
 
 	const clip: TClip | null = await getClip(clipId);
 

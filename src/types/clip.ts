@@ -6,3 +6,5 @@ export type TClip = {
 	createdAt: Date;
 	updatedAt: Date;
 };
+
+export type TNewClip = Omit<TClip, "_id" | "createdAt" | "updatedAt">;
