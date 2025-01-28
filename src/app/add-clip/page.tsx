@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AddClip() {
+	const MAX_FILE_SIZE = Math.pow(1024, 3); // 1 GB
+
 	const [title, setTitle] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
 	const [content, setContent] = useState<File | null>(null);
@@ -17,8 +19,7 @@ export default function AddClip() {
 			alert("All fields are required");
 			return;
 		}
-		if (content.size > 1024 * 1024 * 1024) {
-			// 1 GB size limit
+		if (content.size > MAX_FILE_SIZE) {
 			alert("File size exceeds the limit of 1 GB. Consider shortening the video.");
 			return;
 		}
@@ -27,7 +28,6 @@ export default function AddClip() {
 		formData.append("title", title);
 		formData.append("description", description);
 		formData.append("content", content);
-		formData.append("createdAt", new Date().toISOString());
 
 		try {
 			const res = await fetch("http://localhost:3000/api/clips", {

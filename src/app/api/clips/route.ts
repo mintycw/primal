@@ -27,9 +27,9 @@ export async function GET() {
 	}
 }
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
 	try {
-		const formData = await request.formData();
+		const formData = await req.formData();
 
 		const title = formData.get("title") as string;
 		const description = formData.get("description") as string;
