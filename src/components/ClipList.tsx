@@ -5,6 +5,7 @@ interface Clip {
 	_id: string;
 	title: string;
 	description: string;
+	videoUrl: string;
 }
 
 const getClips = async (): Promise<Clip[]> => {
@@ -34,6 +35,12 @@ export default async function ClipList() {
 					<div>
 						<h2 className="mt-4 text-3xl font-bold">{c.title}</h2>
 						<p>{c.description}</p>
+					</div>
+					<div>
+						<video controls width="600">
+							<source src={c.videoUrl} type="video/mp4" />
+							Your browser does not support the video tag.
+						</video>
 					</div>
 					<div>
 						<RemoveButton id={c._id} />
