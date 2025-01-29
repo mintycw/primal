@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import s3 from "@/lib/minio";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export async function GET() {
 	try {

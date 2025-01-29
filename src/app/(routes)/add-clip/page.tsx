@@ -7,9 +7,11 @@ import { TNewClip } from "@/types/clip";
 
 export default function AddClip() {
 	const router = useRouter();
+	const MAX_FILE_SIZE = Math.pow(1024, 3); // 1 GB
 
 	const [title, setTitle] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
+	const [content, setContent] = useState<File | null>(null);
 
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -17,46 +19,31 @@ export default function AddClip() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!title || !description) {
-			alert("Both title and description are required");
+		if (!title || !description || !content) {
+			alert("All fields are required");
+			return;
+		}
+		if (content.size > MAX_FILE_SIZE) {
+			alert("File size exceeds the limit of 1 GB. Consider shortening the video.");
 			return;
 		}
 
-		const newClip: TNewClip = { title, description };
+		const formData = new FormData();
+		formData.append("title", title);
+		formData.append("description", description);
+		formData.append("content", content);
 
 		setLoading(true);
 		setError(null);
 
-		const createdClip = await postClip(newClip);
-
+		const createdClip = await postClip(formData, content);
 		if (!createdClip) {
 			setError("Failed to create clip. Please try again.");
 		} else {
-			router.push(`/${createdClip._id}`);
+			router.push(`/${createdClip.clipId}`);
 		}
 
 		setLoading(false);
-
-		try {
-			const res = await fetch("http://localhost:3000/api/clips", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(newClip),
-			});
-
-			if (res.ok) {
-				router.push("/");
-			} else {
-				throw new Error("Failed to create clip");
-			}
-
-			const data = await res.json();
-			console.log("Clip created:", data);
-		} catch (error) {
-			console.error("Error creating clip:", error);
-		}
 	};
 
 	return (
@@ -80,10 +67,22 @@ export default function AddClip() {
 					required
 				/>
 			</div>
-			{error && <p className="text-red-500">{error}</p>}
-			<button type="submit" disabled={loading}>
-				{loading ? "Creating..." : "Create Clip"}
-			</button>
+			<div>
+				<label htmlFor="upload">Upload Clip:</label>
+				<input
+					type="file"
+					id="upload"
+					accept="video/*"
+					onChange={(e) => {
+						if (e.target.files && e.target.files[0]) {
+							const file = e.target.files[0];
+							setContent(file);
+						}
+					}}
+					required
+				/>
+			</div>
+			<button type="submit">Create Clip</button>
 		</form>
 	);
 }

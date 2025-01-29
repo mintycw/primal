@@ -2,6 +2,8 @@ import { connectToDatabase } from "@/lib/db/mongodb";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import { RouteParams } from "@/types/param";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import s3 from "@/lib/minio";
 
 export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
@@ -57,6 +59,20 @@ export async function DELETE(req: Request, { params }: RouteParams<{ id: string 
 		if (!clip) {
 			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
 		}
+
+		// Delete the video from MinIO
+		const bucketName = process.env.MINIO_BUCKET;
+		const objectName = clip.objectName; // Object name stored in the database
+
+		const deleteCommand = new DeleteObjectCommand({
+			Bucket: bucketName,
+			Key: objectName, // Path to the video file in MinIO
+		});
+
+		await s3.send(deleteCommand); // Delete the file from MinIO
+
+		// Now delete the clip document from MongoDB
+		await Clip.findByIdAndDelete(id);
 
 		return NextResponse.json({ message: "Clip deleted" }, { status: 200 });
 	} catch (error: any) {

@@ -1,21 +1,37 @@
 import { TNewClip, TClip } from "@/types/clip";
 
-export const postClip = async (newClip: TNewClip): Promise<TClip | null> => {
+// TODO: return is set to any for now, change to TClip
+export const postClip = async (formData: any, content: any): Promise<any> => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips`, {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(newClip),
+			body: formData,
 		});
 
 		if (!res.ok) {
 			throw new Error("Failed to create clip");
 		}
 
-		const createdClip: TClip = await res.json();
-		return createdClip;
+		// TODO: Make sure to return object that fits the TClip type
+		const data = await res.json();
+		const uploadUrl = data.uploadUrl;
+
+		// Upload the video to the signed URL
+		const uploadRes = await fetch(uploadUrl, {
+			method: "PUT",
+			headers: {
+				"Content-Type": content.type,
+			},
+			body: content, // Upload the file content
+		});
+
+		if (uploadRes.ok) {
+			return data;
+		} else {
+			const errorText = await uploadRes.text();
+			console.error("Upload response error:", uploadRes.status, errorText);
+			throw new Error("Failed to upload video to bulk database");
+		}
 	} catch (error) {
 		console.error("Error creating clip:", error);
 		return null;
