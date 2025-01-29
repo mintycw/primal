@@ -1,7 +1,9 @@
 "use client";
 
+import { putClip } from "@/lib/clips/postClip";
+import { TNewClip } from "@/types/clip";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface EditClipProps {
 	id: string;
@@ -10,13 +12,13 @@ interface EditClipProps {
 }
 
 export default function EditClipInfo({ id, title, description }: EditClipProps) {
-	const [newTitle, setNewTitle] = useState(title);
-	const [newDescription, setNewDescription] = useState(description);
 	const router = useRouter();
 
-	useEffect(() => {
-		console.log(id, title, description);
-	}, [id, title, description]);
+	const [newTitle, setNewTitle] = useState(title);
+	const [newDescription, setNewDescription] = useState(description);
+
+	const [loading, setLoading] = useState<boolean>(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -26,30 +28,23 @@ export default function EditClipInfo({ id, title, description }: EditClipProps) 
 			return;
 		}
 
-		const editClip = {
-			newTitle,
-			newDescription,
+		const editClip: TNewClip = {
+			title: newTitle,
+			description: newDescription,
 		};
-		try {
-			const res = await fetch(`http://localhost:3000/api/clips/${id}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(editClip),
-			});
 
-			if (res.ok) {
-				router.push("/");
-			} else {
-				throw new Error("Failed to update clip");
-			}
+		setLoading(true);
+		setError(null);
 
-			const data = await res.json();
-			console.log("Clip updated:", data);
-		} catch (error) {
-			console.error("Error updating clip:", error);
+		const editedClip = await putClip(id, editClip);
+
+		if (!editedClip) {
+			alert("Failed to update clip. Please try again.");
+		} else {
+			router.push(`/${editedClip._id}`);
 		}
+
+		setLoading(false);
 	};
 
 	return (
@@ -73,7 +68,10 @@ export default function EditClipInfo({ id, title, description }: EditClipProps) 
 					required
 				/>
 			</div>
-			<button type="submit">Edit Clip</button>
+			{error && <p className="text-red-500">{error}</p>}
+			<button type="submit" disabled={loading}>
+				{loading ? "Editing..." : "Edit Clip"}
+			</button>
 		</form>
 	);
 }

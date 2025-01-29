@@ -1,15 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { TClip } from "@/types/clip";
 
-export interface IClip extends Document {
-	title: string;
-	description: string;
-	signedUrl: string;
-	objectName: string;
-	createdAt: Date;
-	updatedAt: Date;
-}
+type ClipDocument = Omit<TClip, "_id"> & Document;
 
-const ClipSchema = new Schema<IClip>(
+const ClipSchema = new Schema<ClipDocument>(
 	{
 		title: {
 			type: String,
@@ -32,5 +26,6 @@ const ClipSchema = new Schema<IClip>(
 		timestamps: true,
 	}
 );
+
 // Compile model from schema even if already exists or not
-export const Clip: Model<IClip> = mongoose.models.Clip || mongoose.model("Clip", ClipSchema);
+export const Clip: Model<ClipDocument> = mongoose.models.Clip || mongoose.model("Clip", ClipSchema);
