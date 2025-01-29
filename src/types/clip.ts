@@ -1,7 +1,7 @@
 export type TClip = {
 	_id: string;
 	title: string;
-	content?: string; // OPTIONAL BUT ONLY TEMPORARILY
+	content?: string;
 	description?: string;
 	createdAt: Date;
 	updatedAt: Date;
