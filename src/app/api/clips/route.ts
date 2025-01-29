@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 		const newClip = new Clip({
 			title,
 			description,
-			signedUrl,
+			videoUrl: `${process.env.S3_ENDPOINT}/${bucketName}/${objectName}`,
 			objectName,
 		});
 

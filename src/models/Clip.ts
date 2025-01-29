@@ -13,7 +13,7 @@ const ClipSchema = new Schema<ClipDocument>(
 			type: String,
 			required: true,
 		},
-		signedUrl: {
+		videoUrl: {
 			type: String,
 			required: true,
 		},
