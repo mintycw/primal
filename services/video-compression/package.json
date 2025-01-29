@@ -1,0 +1,15 @@
+{
+	"name": "primal-video-compression",
+	"version": "1.0.0",
+	"description": "A service to compress videos using GPU acceleration",
+	"main": "server.js",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"dependencies": {
+		"express": "^4.18.2",
+		"express-fileupload": "^1.4.0",
+		"fluent-ffmpeg": "^2.1.2"
+	},
+	"type": "module"
+}
