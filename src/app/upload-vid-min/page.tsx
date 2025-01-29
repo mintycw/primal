@@ -20,7 +20,7 @@ export default function UploadClipTest() {
 
 		const { url } = await res.json();
 
-		// Upload file to MinIO using the signed URL
+		// Upload file to S3 using the signed URL
 		await fetch(url, {
 			method: "PUT",
 			body: file,
@@ -34,7 +34,7 @@ export default function UploadClipTest() {
 		<div>
 			<input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
 			<button onClick={handleUpload} disabled={!file}>
-				Upload to MinIO
+				Upload to S3
 			</button>
 		</div>
 	);

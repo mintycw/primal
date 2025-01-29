@@ -1,7 +1,7 @@
 import { connectToDatabase } from "@/lib/db/mongodb";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
-import s3 from "@/lib/minio";
+import s3 from "@/lib/db/s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 
@@ -13,7 +13,7 @@ export async function GET() {
 
 		const clipsWithData = clips.map((clip) => {
 			// generate dynamic url
-			const videoUrl = `${process.env.MINIO_ENDPOINT}/${process.env.MINIO_BUCKET}/${clip.objectName}`;
+			const videoUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${clip.objectName}`;
 			return { ...clip.toObject(), videoUrl };
 		});
 
@@ -32,14 +32,13 @@ export async function POST(req: Request) {
 
 		const title = formData.get("title") as string;
 		const description = formData.get("description") as string;
-		const createdAt = formData.get("createdAt") as string;
 		const file = formData.get("content") as File;
 
 		if (!title || !description || !file) {
 			return NextResponse.json({ error: "All fields are required" }, { status: 400 });
 		}
 
-		const bucketName = process.env.MINIO_BUCKET;
+		const bucketName = process.env.S3_BUCKET;
 		const objectName = `defaultUser/${Date.now()}-${file.name}`; // location and name
 
 		// Generates presigned URL for upload
@@ -59,7 +58,6 @@ export async function POST(req: Request) {
 			description,
 			signedUrl,
 			objectName,
-			createdAt: new Date(createdAt),
 		});
 
 		const savedClip = await newClip.save();
