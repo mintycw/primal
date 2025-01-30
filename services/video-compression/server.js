@@ -56,8 +56,7 @@ app.post("/compress", (req, res) => {
 			});
 		})
 		.on("error", (err, stdout, stderr) => {
-			console.error("Error compressing video:", err);
-			console.error("FFmpeg stderr:", stderr);
+			console.error(`Error compressing video: ${err}\nFFmpeg stderr: ${stderr}`);
 			res.status(500).send("Failed to compress video.");
 		})
 		.run();

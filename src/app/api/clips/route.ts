@@ -11,7 +11,7 @@ import path from "path";
 export const config = {
 	api: {
 		bodyParser: {
-			sizeLimit: "1024mb", // Increase the limit to 50MB (adjust as needed)
+			sizeLimit: "1024mb",
 		},
 	},
 };
