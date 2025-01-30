@@ -1,6 +1,6 @@
 ## Getting Started
 
-Create a .env file in the root directory:
+Create a .env file in the root directory or change .env.example to .env:
 
 ```enviromment
 MONGODB_URI=
@@ -9,6 +9,8 @@ S3_BUCKET=
 S3_REGION=
 S3_ACCESS_KEY=
 S3_SECRET_KEY=
+VIDEO_COMPRESSION=false
+VIDEO_COMPRESSION_ENDPOINT=
 ```
 
 Run the development server:
