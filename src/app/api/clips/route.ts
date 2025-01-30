@@ -109,12 +109,15 @@ export async function POST(req: Request) {
 	}
 }
 
-async function sendEndpointForCompression(file: File, truenasEndpoint: string): Promise<Buffer> {
+async function sendEndpointForCompression(
+	file: File,
+	compressionEndpoint: string
+): Promise<Buffer> {
 	try {
 		const form = new FormData();
 		form.append("video", new Blob([await file.arrayBuffer()]), file.name);
 
-		const response = await fetch(`${truenasEndpoint}/compress`, {
+		const response = await fetch(`${compressionEndpoint}/compress`, {
 			method: "POST",
 			body: form,
 		});
