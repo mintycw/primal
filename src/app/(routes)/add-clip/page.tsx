@@ -7,7 +7,7 @@ import { TNewClip } from "@/types/clip";
 
 export default function AddClip() {
 	const router = useRouter();
-	const MAX_FILE_SIZE = Math.pow(1024, 3); // 1 GB
+	const MAX_FILE_SIZE = 500 * Math.pow(1024, 2); // 500 MB
 
 	const [title, setTitle] = useState<string>("");
 	const [description, setDescription] = useState<string>("");

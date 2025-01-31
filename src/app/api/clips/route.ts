@@ -8,6 +8,7 @@ import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
 
+// Does not have to be changed unless we go beyond 1GB
 export const config = {
 	api: {
 		bodyParser: {
