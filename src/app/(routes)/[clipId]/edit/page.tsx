@@ -1,10 +1,12 @@
 import { getClip } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
-import { RouteParams } from "@/types/param";
+//import { RouteParams } from "@/types/param";
+
+type tParams = Promise<{ clipId: string }>;
 
 import EditClipInfo from "./EditClipInfo";
 
-export default async function EditClip({ params }: RouteParams<{ clipId: string }>) {
+export default async function EditClip({ params }: { params: tParams }) {
 	const { clipId } = await params;
 
 	if (!clipId) {

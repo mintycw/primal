@@ -1,11 +1,13 @@
 import { connectToDatabase } from "@/lib/db/mongodb";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
-import { RouteParams } from "@/types/param";
+//import { RouteParams } from "@/types/param";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "@/lib/db/s3";
 
-export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
+type tParams = Promise<{ id: string }>;
+
+export async function PUT(req: Request, { params }: { params: tParams }) {
 	try {
 		await connectToDatabase();
 		const { id } = await params;
@@ -33,7 +35,7 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 }
 
 // Specific clip fetch
-export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
+export async function GET(req: Request, { params }: { params: tParams }) {
 	try {
 		await connectToDatabase();
 		const { id } = await params;
@@ -46,7 +48,7 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 	}
 }
 
-export async function DELETE(req: Request, { params }: RouteParams<{ id: string }>) {
+export async function DELETE(req: Request, { params }: { params: tParams }) {
 	try {
 		await connectToDatabase();
 		const { id } = await params;

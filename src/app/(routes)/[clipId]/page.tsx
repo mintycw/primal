@@ -1,9 +1,11 @@
 import { getClip } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
-import { RouteParams } from "@/types/param";
+//import { RouteParams } from "@/types/param";
 import ClipDetails from "./ClipDetails";
 
-export default async function Clip({ params }: RouteParams<{ clipId: string }>) {
+type tParams = Promise<{ clipId: string }>;
+
+export default async function Clip({ params }: { params: tParams }) {
 	const { clipId } = await params;
 
 	const clip: TClip | null = await getClip(clipId);
