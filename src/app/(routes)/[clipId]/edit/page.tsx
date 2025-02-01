@@ -1,18 +1,16 @@
 import { getClip } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
-import { headers } from "next/headers";
+import { RouteParams } from "@/types/param";
 
 import EditClipInfo from "./EditClipInfo";
 
-export type paramsType = Promise<{ clipId: string }>;
+export default async function EditClip({ params }: RouteParams<{ clipId: string }>) {
+	const { clipId } = await params;
 
-export default async function EditClip(props: { params: paramsType }) {
-	const { clipId } = await props.params;
+	if (!clipId) {
+		return <div>Clip ID is missing</div>;
+	}
 
-	const headersList = await headers();
-	const userAgent = headersList.get("user-agent");
-
-	// Fetch the clip data
 	const clip: TClip | null = await getClip(clipId);
 
 	if (!clip) {
@@ -22,7 +20,6 @@ export default async function EditClip(props: { params: paramsType }) {
 	return (
 		<div>
 			<EditClipInfo id={clip._id} title={clip.title} description={clip.description || ""} />
-			<p>User Agent: {userAgent}</p>
 		</div>
 	);
 }

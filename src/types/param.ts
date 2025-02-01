@@ -1,5 +1,3 @@
-export type RouteParams<
-	T extends Record<string, string | number | boolean> = Record<string, string | number | boolean>,
-> = {
+export type RouteParams<T extends Record<string, string> = Record<string, string>> = {
 	params: T;
 };
