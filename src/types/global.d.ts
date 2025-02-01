@@ -1,6 +1,3 @@
-import mongoose from "mongoose";
-import { MongooseCache } from "@/lib/db/mongodb";
-
 declare namespace NodeJS {
 	interface ProcessEnv {
 		MONGODB_URI: string | null;
