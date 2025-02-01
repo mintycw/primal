@@ -3,19 +3,17 @@ import { TClip } from "@/types/clip";
 
 import EditClipInfo from "./EditClipInfo";
 
-type EditClipProps = {
-	params: {
-		clipId: string;
-	};
-};
-
-export default async function EditClip({ params }: EditClipProps) {
+export default async function EditClip({
+	params,
+	searchParams,
+}: {
+	params: { clipId: string };
+	searchParams: { [key: string]: string | string[] | undefined };
+}) {
 	const { clipId } = params;
+	const { query } = searchParams;
 
-	if (!clipId) {
-		return <div>Clip ID is missing</div>;
-	}
-
+	// Fetch the clip data
 	const clip: TClip | null = await getClip(clipId);
 
 	if (!clip) {
@@ -25,6 +23,7 @@ export default async function EditClip({ params }: EditClipProps) {
 	return (
 		<div>
 			<EditClipInfo id={clip._id} title={clip.title} description={clip.description || ""} />
+			<p>Search Query: {query}</p>
 		</div>
 	);
 }
