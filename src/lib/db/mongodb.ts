@@ -14,11 +14,7 @@ interface MongooseCache {
 }
 
 // Add the cache to the global object (to persist it between hot reloads in development)
-let cached: MongooseCache = (global as any).mongooseCache || { conn: null, promise: null };
-
-if (!(global as any).mongooseCache) {
-	(global as any).mongooseCache = cached;
-}
+const cached: MongooseCache = { conn: null, promise: null };
 
 export async function connectToDatabase(): Promise<Mongoose> {
 	if (cached.conn) {

@@ -7,7 +7,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
-import { TNewClip, TClip } from "@/types/clip";
+
 // Does not have to be changed unless we go beyond 1GB
 export const config = {
 	api: {
@@ -48,6 +48,10 @@ export async function POST(req: Request) {
 		const bucketName = process.env.S3_BUCKET;
 		const enableCompression = process.env.VIDEO_COMPRESSION === "true";
 		const localCompression = process.env.LOCAL_VIDEO_COMPRESSION === "true";
+
+		if (!bucketName) {
+			throw new Error("S3_BUCKET is not defined in environment variables.");
+		}
 
 		if (!title || !description || !file) {
 			return NextResponse.json({ error: "All fields are required" }, { status: 400 });
@@ -145,6 +149,11 @@ async function sendEndpointForCompression(
 async function compressVideoOnNextJS(file: File): Promise<Buffer> {
 	const tempInputPath = path.join("/tmp", file.name);
 	const tempOutputPath = path.join("/tmp", `compressed-${file.name}`);
+	const localCodec = process.env.LOCAL_VIDEO_CODEC;
+
+	if (!localCodec) {
+		throw new Error("LOCAL_VIDEO_ENCODER is not defined in environment variables.");
+	}
 
 	// Write buffer to temp file
 	const buffer = Buffer.from(await file.arrayBuffer());
@@ -154,7 +163,7 @@ async function compressVideoOnNextJS(file: File): Promise<Buffer> {
 	await new Promise((resolve, reject) => {
 		ffmpeg(tempInputPath)
 			.output(tempOutputPath)
-			.videoCodec("hevc_nvenc")
+			.videoCodec(localCodec)
 			.audioCodec("aac")
 			.audioBitrate("128k")
 			.outputOptions([
