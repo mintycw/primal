@@ -3,7 +3,13 @@ import { TClip } from "@/types/clip";
 
 import EditClipInfo from "./EditClipInfo";
 
-export default async function EditClip({ params }: { params: { clipId: string } }) {
+type EditClipProps = {
+	params: {
+		clipId: string;
+	};
+};
+
+export default async function EditClip({ params }: EditClipProps) {
 	const { clipId } = params;
 
 	if (!clipId) {
