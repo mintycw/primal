@@ -11,4 +11,7 @@ export type TClip = {
 	updatedAt: Date;
 };
 
-export type TNewClip = Omit<TClip, "_id" | "createdAt" | "updatedAt" | "objectName" | "videoUrl">;
+export type TNewClip = Omit<
+	TClip,
+	"_id" | "clipId" | "uploadUrl" | "videoUrl" | "createdAt" | "updatedAt" | "objectName"
+>;
