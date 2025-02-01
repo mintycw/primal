@@ -4,12 +4,16 @@ import { headers } from "next/headers";
 
 import EditClipInfo from "./EditClipInfo";
 
-export default async function EditClip({ params }: { params: { clipId: string } }) {
+export type paramsType = Promise<{ clipId: string }>;
+
+export default async function EditClip(props: { params: paramsType }) {
+	const { clipId } = await props.params;
+
 	const headersList = await headers();
 	const userAgent = headersList.get("user-agent");
 
 	// Fetch the clip data
-	const clip: TClip | null = await getClip(params.clipId);
+	const clip: TClip | null = await getClip(clipId);
 
 	if (!clip) {
 		return <div>Clip not found</div>;
