@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postClip } from "@/lib/clips/postClip";
-import { TNewClip } from "@/types/clip";
 
 export default function AddClip() {
 	const router = useRouter();

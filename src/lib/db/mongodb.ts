@@ -1,4 +1,4 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose, { Mongoose, ConnectOptions } from "mongoose";
 
 // Get the URI of the local database from the environment
 const MONGODB_URI = process.env.MONGODB_URI as string;
@@ -14,14 +14,10 @@ interface MongooseCache {
 }
 
 // Add the cache to the global object (to persist it between hot reloads in development)
-declare global {
-	var mongooseCache: MongooseCache | undefined;
-}
+let cached: MongooseCache = (global as any).mongooseCache || { conn: null, promise: null };
 
-let cached: MongooseCache = global.mongooseCache || { conn: null, promise: null };
-
-if (!global.mongooseCache) {
-	global.mongooseCache = cached;
+if (!(global as any).mongooseCache) {
+	(global as any).mongooseCache = cached;
 }
 
 export async function connectToDatabase(): Promise<Mongoose> {
@@ -30,12 +26,8 @@ export async function connectToDatabase(): Promise<Mongoose> {
 	}
 
 	if (!cached.promise) {
-		const options = {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-		};
-
-		cached.promise = mongoose.connect(MONGODB_URI, {});
+		const options: ConnectOptions = {};
+		cached.promise = mongoose.connect(MONGODB_URI, options);
 	}
 
 	cached.conn = await cached.promise;

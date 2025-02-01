@@ -7,7 +7,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
-
+import { TNewClip, TClip } from "@/types/clip";
 // Does not have to be changed unless we go beyond 1GB
 export const config = {
 	api: {
@@ -32,7 +32,7 @@ export async function GET() {
 		console.log("Clips fetched:", clipsWithData);
 
 		return NextResponse.json(clipsWithData);
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error(error);
 		return NextResponse.json({ error: "Failed to fetch clips" }, { status: 500 });
 	}
@@ -47,6 +47,7 @@ export async function POST(req: Request) {
 		const file = formData.get("content") as File;
 		const bucketName = process.env.S3_BUCKET;
 		const enableCompression = process.env.VIDEO_COMPRESSION === "true";
+		const localCompression = process.env.LOCAL_VIDEO_COMPRESSION === "true";
 
 		if (!title || !description || !file) {
 			return NextResponse.json({ error: "All fields are required" }, { status: 400 });
@@ -54,10 +55,15 @@ export async function POST(req: Request) {
 
 		console.log(`Video compression is ${enableCompression ? "enabled" : "disabled"}`);
 
-		let buffer: Buffer;
 		let objectName: string; // location and name
 
-		if (enableCompression) {
+		if (enableCompression && localCompression) {
+			objectName = `defaultUser/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
+			// Perform local compression
+			console.log("Compressing video locally...");
+			await compressVideoOnNextJS(file);
+			console.log("Video compressed locally.");
+		} else if (enableCompression) {
 			objectName = `defaultUser/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
 			const compressionEndpoint = process.env.VIDEO_COMPRESSION_ENDPOINT;
 			if (!compressionEndpoint) {
@@ -66,12 +72,11 @@ export async function POST(req: Request) {
 				);
 			}
 			// Compress video on endpoint (can be changed to compressVideoOnNextJS but not recommended)
-			buffer = await sendEndpointForCompression(file, compressionEndpoint);
+			await sendEndpointForCompression(file, compressionEndpoint);
 			console.log("Video is being compressed...");
 		} else {
 			// origninal video
 			objectName = `defaultUser/${Date.now()}-${file.name}`; // location and name
-			buffer = Buffer.from(await file.arrayBuffer());
 			console.log("Using original video without compression.");
 		}
 
@@ -136,7 +141,7 @@ async function sendEndpointForCompression(
 	}
 }
 
-// NOT IN USE: Compress the video withtin Next.js (not recommended)
+// Compress the video withtin Next.js (not recommended)
 async function compressVideoOnNextJS(file: File): Promise<Buffer> {
 	const tempInputPath = path.join("/tmp", file.name);
 	const tempOutputPath = path.join("/tmp", `compressed-${file.name}`);
@@ -153,9 +158,9 @@ async function compressVideoOnNextJS(file: File): Promise<Buffer> {
 			.audioCodec("aac")
 			.audioBitrate("128k")
 			.outputOptions([
-				"-preset p4", // Balanced preset
+				"-preset p5", // Balanced preset
 				"-cq 32", // Constant quality
-				"-vf scale=1920:1080", // Cap resolution to 1080p
+				"-vf scale=1920:1080:force_original_aspect_ratio=decrease", // Cap resolution to 1080p
 				"-f mp4", // Output format
 			])
 			.on("progress", (progress) => {

@@ -1,10 +1,14 @@
 import mongoose from "mongoose";
-import { File } from "multer";
-import { IncomingMessage } from "http";
+import { MongooseCache } from "../db/mongodb";
 
 declare global {
-	var mongoose: {
-		conn: mongoose.Connection | null;
-		promise: Promise<typeof mongoose> | null;
-	};
+	interface MongooseCache {
+		conn: Mongoose | null;
+		promise: Promise<Mongoose> | null;
+	}
+	namespace NodeJS {
+		interface Global {
+			mongooseCache?: MongooseCache;
+		}
+	}
 }

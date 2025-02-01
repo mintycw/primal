@@ -26,7 +26,7 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 
 		await Clip.findByIdAndUpdate(id, { title, description });
 		return NextResponse.json(clip, { status: 200 });
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error("Error updating clip:", error);
 		return NextResponse.json({ error: "Failed to update clip" }, { status: 500 });
 	}
@@ -40,7 +40,7 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 		const clip = await Clip.find().findOne({ _id: id });
 
 		return NextResponse.json({ clip }, { status: 200 });
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error(error);
 		return NextResponse.json({ error: "Failed to fetch clip" }, { status: 500 });
 	}
@@ -75,7 +75,7 @@ export async function DELETE(req: Request, { params }: RouteParams<{ id: string 
 		await Clip.findByIdAndDelete(id);
 
 		return NextResponse.json({ message: "Clip deleted" }, { status: 200 });
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error("Error deleting clip:", error);
 		return NextResponse.json({ error: "Failed to delete clip" }, { status: 500 });
 	}
