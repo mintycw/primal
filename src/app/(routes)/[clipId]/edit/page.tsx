@@ -1,10 +1,15 @@
 import { getClip } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
-import { RouteParams } from "@/types/param";
 
 import EditClipInfo from "./EditClipInfo";
 
-export default async function EditClip({ params }: RouteParams<{ clipId: string }>) {
+type Props = {
+	params: {
+		clipId: string;
+	};
+};
+
+export default async function EditClip({ params }: Props) {
 	const { clipId } = params;
 
 	if (!clipId) {
