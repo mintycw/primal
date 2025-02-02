@@ -1,5 +1,6 @@
 declare namespace NodeJS {
 	interface ProcessEnv {
+		NEXT_PUBLIC_API_BASE_URL: string | undefined;
 		MONGODB_URI: string | null;
 		S3_ENDPOINT: string | null;
 		S3_BUCKET: string | undefined;
