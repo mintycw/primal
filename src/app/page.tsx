@@ -8,7 +8,7 @@ export default function Home() {
 		<>
 			<h1>Main</h1>
 			<Feed />
-			<Link href="/add-clip" className="rounded bg-gray-500 px-4 py-2 text-white">
+			<Link href="/add-clip" className="rounded-sm bg-gray-500 px-4 py-2 text-white">
 				Add Clip
 			</Link>
 		</>

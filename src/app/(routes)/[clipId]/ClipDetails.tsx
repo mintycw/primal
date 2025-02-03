@@ -23,10 +23,13 @@ export default function ClipDetails({ clip }: ClipDetailsProps) {
 			</video>
 			<p>Created: {clip.createdAt.toString()}</p>
 			<p>Updated: {clip.updatedAt.toString()}</p>
-			<button onClick={handleDelete} className="rounded bg-red-500 px-4 py-2 text-white">
+			<button onClick={handleDelete} className="rounded-sm bg-red-500 px-4 py-2 text-white">
 				Delete
 			</button>
-			<Link className="rounded bg-green-500 px-4 py-2 text-white" href={`${clip._id}/edit`}>
+			<Link
+				className="rounded-sm bg-green-500 px-4 py-2 text-white"
+				href={`${clip._id}/edit`}
+			>
 				EDIT
 			</Link>
 		</div>
