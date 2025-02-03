@@ -1,17 +1,18 @@
 import { getClip } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
-//import { RouteParams } from "@/types/param";
-
-type tParams = Promise<{ clipId: string }>;
-
+import { RouteParams } from "@/types/param";
 import EditClipInfo from "./EditClipInfo";
 
-export default async function EditClip({ params }: { params: tParams }) {
-	const { clipId } = await params;
+export default async function EditClip({ params }: RouteParams<{ clipId: string }>) {
+	// Await the params to resolve the Promise
+	const resolvedParams = await params;
 
-	if (!clipId) {
+	// Handle missing params
+	if (!resolvedParams || !resolvedParams.clipId) {
 		return <div>Clip ID is missing</div>;
 	}
+
+	const { clipId } = await resolvedParams;
 
 	const clip: TClip | null = await getClip(clipId);
 

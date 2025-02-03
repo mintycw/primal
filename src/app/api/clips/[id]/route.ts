@@ -1,21 +1,19 @@
 import { connectToDatabase } from "@/lib/db/mongodb";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
-//import { RouteParams } from "@/types/param";
+import { RouteParams } from "@/types/param";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "@/lib/db/s3";
 
-type tParams = Promise<{ id: string }>;
-
-export async function PUT(req: Request, { params }: { params: tParams }) {
+export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
-		const { id } = await params;
-
-		if (!id) {
+		const resolvedParams = await params;
+		if (!resolvedParams || !resolvedParams.id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
 
+		const { id } = await resolvedParams;
 		const { title, description } = await req.json();
 		if (!title || !description) {
 			return NextResponse.json({ error: "Invalid data provided" }, { status: 400 });
@@ -35,11 +33,20 @@ export async function PUT(req: Request, { params }: { params: tParams }) {
 }
 
 // Specific clip fetch
-export async function GET(req: Request, { params }: { params: tParams }) {
+export async function GET(req: Request, { params }: RouteParams) {
 	try {
 		await connectToDatabase();
-		const { id } = await params;
-		const clip = await Clip.find().findOne({ _id: id });
+		const resolvedParams = await params;
+		if (!resolvedParams || !resolvedParams.id) {
+			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
+		}
+
+		const { id } = await resolvedParams;
+		const clip = await Clip.findOne({ _id: id });
+
+		if (!clip) {
+			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
+		}
 
 		return NextResponse.json({ clip }, { status: 200 });
 	} catch (error: unknown) {
@@ -48,15 +55,15 @@ export async function GET(req: Request, { params }: { params: tParams }) {
 	}
 }
 
-export async function DELETE(req: Request, { params }: { params: tParams }) {
+export async function DELETE(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
-		const { id } = await params;
-
-		if (!id) {
+		const resolvedParams = await params;
+		if (!resolvedParams || !resolvedParams.id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
 
+		const { id } = await resolvedParams;
 		const clip = await Clip.findByIdAndDelete(id);
 		if (!clip) {
 			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
