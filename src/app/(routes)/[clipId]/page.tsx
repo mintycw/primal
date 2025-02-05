@@ -4,16 +4,12 @@ import { RouteParams } from "@/types/param";
 import ClipDetails from "./ClipDetails";
 
 export default async function Clip({ params }: RouteParams<{ clipId: string }>) {
-	const resolvedParams = await params;
-
-	if (!resolvedParams || !resolvedParams.clipId) {
+	const { clipId } = await params;
+	if (!clipId) {
 		return <div>Clip ID is missing</div>;
 	}
 
-	const { clipId } = await resolvedParams;
-
 	const clip: TClip | null = await getClip(clipId);
-
 	if (!clip) {
 		return <div>Clip not found</div>;
 	}
