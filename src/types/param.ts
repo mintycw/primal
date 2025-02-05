@@ -1,5 +1,5 @@
 export type RouteParams<T extends Record<string, string> = Record<string, string>> = {
-	params: Promise<T> | undefined;
+	params: Promise<T>;
 };
 
 export type ResolvedRouteParams<T extends Record<string, string> = Record<string, string>> = {
