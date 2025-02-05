@@ -28,6 +28,20 @@ jobs:
             - name: Run linting
               run: npm run lint
 
+            - name: Set environment variables from secrets
+              run: |
+                  echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" >> $GITHUB_ENV
+                  echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> $GITHUB_ENV
+                  echo "S3_ENDPOINT=${{ secrets.S3_ENDPOINT }}" >> $GITHUB_ENV
+                  echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> $GITHUB_ENV
+                  echo "S3_REGION=${{ secrets.S3_REGION }}" >> $GITHUB_ENV
+                  echo "S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}" >> $GITHUB_ENV
+                  echo "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" >> $GITHUB_ENV
+                  echo "VIDEO_COMPRESSION=${{ secrets.VIDEO_COMPRESSION }}" >> $GITHUB_ENV
+                  echo "VIDEO_COMPRESSION_ENDPOINT=${{ secrets.VIDEO_COMPRESSION_ENDPOINT }}" >> $GITHUB_ENV
+                  echo "LOCAL_VIDEO_COMPRESSION=${{ secrets.LOCAL_VIDEO_COMPRESSION }}" >> $GITHUB_ENV
+                  echo "LOCAL_VIDEO_CODEC=${{ secrets.LOCAL_VIDEO_CODEC }}" >> $GITHUB_ENV
+
             # - name: Run tests
             #   run: npm test
 
