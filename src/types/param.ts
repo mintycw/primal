@@ -1,6 +1,5 @@
 export type RouteParams<T extends Record<string, string> = Record<string, string>> = {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	params: Promise<T> | undefined | any;
+	params: Promise<T> | undefined;
 };
 
 export type ResolvedRouteParams<T extends Record<string, string> = Record<string, string>> = {
