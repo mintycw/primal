@@ -9,7 +9,6 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 	try {
 		await connectToDatabase();
 		const { id } = await params;
-
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
@@ -26,7 +25,7 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 
 		await Clip.findByIdAndUpdate(id, { title, description });
 		return NextResponse.json(clip, { status: 200 });
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error("Error updating clip:", error);
 		return NextResponse.json({ error: "Failed to update clip" }, { status: 500 });
 	}
@@ -37,10 +36,17 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 	try {
 		await connectToDatabase();
 		const { id } = await params;
-		const clip = await Clip.find().findOne({ _id: id });
+		const clip = await Clip.findOne({ _id: id });
+
+		if (!id) {
+			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
+		}
+		if (!clip) {
+			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
+		}
 
 		return NextResponse.json({ clip }, { status: 200 });
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error(error);
 		return NextResponse.json({ error: "Failed to fetch clip" }, { status: 500 });
 	}
@@ -50,12 +56,11 @@ export async function DELETE(req: Request, { params }: RouteParams<{ id: string 
 	try {
 		await connectToDatabase();
 		const { id } = await params;
+		const clip = await Clip.findByIdAndDelete(id);
 
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
-
-		const clip = await Clip.findByIdAndDelete(id);
 		if (!clip) {
 			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
 		}
@@ -75,7 +80,7 @@ export async function DELETE(req: Request, { params }: RouteParams<{ id: string 
 		await Clip.findByIdAndDelete(id);
 
 		return NextResponse.json({ message: "Clip deleted" }, { status: 200 });
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error("Error deleting clip:", error);
 		return NextResponse.json({ error: "Failed to delete clip" }, { status: 500 });
 	}

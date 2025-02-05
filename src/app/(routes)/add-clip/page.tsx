@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postClip } from "@/lib/clips/postClip";
-import { TNewClip } from "@/types/clip";
 
 export default function AddClip() {
 	const router = useRouter();
@@ -56,6 +55,7 @@ export default function AddClip() {
 					value={title}
 					onChange={(e) => setTitle(e.target.value)}
 					required
+					disabled={loading}
 				/>
 			</div>
 			<div>
@@ -65,6 +65,7 @@ export default function AddClip() {
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
 					required
+					disabled={loading}
 				/>
 			</div>
 			<div>
@@ -80,9 +81,13 @@ export default function AddClip() {
 						}
 					}}
 					required
+					disabled={loading}
 				/>
 			</div>
-			<button type="submit">Create Clip</button>
+			{error && <div style={{ color: "red" }}>{error}</div>}
+			<button type="submit" disabled={loading}>
+				{loading ? "Creating Clip..." : "Create Clip"}
+			</button>
 		</form>
 	);
 }

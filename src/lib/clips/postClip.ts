@@ -1,7 +1,7 @@
 import { TNewClip, TClip } from "@/types/clip";
 
 // TODO: return is set to any for now, change to TClip
-export const postClip = async (formData: any, content: any): Promise<any> => {
+export const postClip = async (formData: FormData, content: File): Promise<TClip | null> => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips`, {
 			method: "POST",
@@ -12,8 +12,8 @@ export const postClip = async (formData: any, content: any): Promise<any> => {
 			throw new Error("Failed to create clip");
 		}
 
-		// TODO: Make sure to return object that fits the TClip type
-		const data = await res.json();
+		// TODO: Make sure to return object that fits the TClip type // DONE :)
+		const data: TClip = await res.json();
 		const uploadUrl = data.uploadUrl;
 
 		// Upload the video to the signed URL
