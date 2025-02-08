@@ -1,4 +1,4 @@
-import { TNewClip, TClip } from "@/types/clip";
+import { TClip, TClipUpdate } from "@/types/clip";
 
 // TODO: return is set to any for now, change to TClip
 export const postClip = async (formData: FormData, content: File): Promise<TClip | null> => {
@@ -38,7 +38,7 @@ export const postClip = async (formData: FormData, content: File): Promise<TClip
 	}
 };
 
-export const putClip = async (id: string, editClip: TNewClip): Promise<TClip | null> => {
+export const putClip = async (id: string, editClip: TClipUpdate): Promise<TClip | null> => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips/${id}`, {
 			method: "PUT",

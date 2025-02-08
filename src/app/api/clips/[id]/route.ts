@@ -36,8 +36,7 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 	try {
 		await connectToDatabase();
 		const { id } = await params;
-		const clip = await Clip.findOne({ _id: id });
-
+		const clip = await Clip.findOne({ _id: id }).populate("user", "name image");
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}

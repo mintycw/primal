@@ -7,6 +7,8 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
 
 // Does not have to be changed unless we go beyond 1GB
 export const config = {
@@ -21,8 +23,7 @@ export async function GET() {
 	try {
 		await connectToDatabase();
 
-		const clips = await Clip.find().sort({ createdAt: -1 });
-
+		const clips = await Clip.find().sort({ createdAt: -1 }).populate("user", "name image");
 		const clipsWithData = clips.map((clip) => {
 			// generate dynamic url
 			const videoUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${clip.objectName}`;
@@ -40,6 +41,12 @@ export async function GET() {
 
 export async function POST(req: Request) {
 	try {
+		const session = await getServerSession(authOptions);
+
+		if (!session?.user?._id) {
+			return NextResponse.json({ error: "User is not authenticated" }, { status: 401 });
+		}
+
 		const formData = await req.formData();
 
 		const title = formData.get("title") as string;
@@ -101,6 +108,7 @@ export async function POST(req: Request) {
 			description,
 			videoUrl: `${process.env.S3_ENDPOINT}/${bucketName}/${objectName}`,
 			objectName,
+			user: session.user._id,
 		});
 
 		const savedClip = await newClip.save();

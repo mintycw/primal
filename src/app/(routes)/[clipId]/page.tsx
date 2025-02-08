@@ -6,7 +6,7 @@ import ClipDetails from "./ClipDetails";
 export default async function Clip({ params }: RouteParams<{ clipId: string }>) {
 	const { clipId } = await params;
 	if (!clipId) {
-		return <div>Clip ID is missing</div>;
+		return <div>Page not found</div>;
 	}
 
 	const clip: TClip | null = await getClip(clipId);
