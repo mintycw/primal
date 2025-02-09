@@ -42,6 +42,7 @@
 		"jest-environment-jsdom": "^29.7.0",
 		"lint-staged": "^15.4.2",
 		"node-mock-http": "^1.0.0",
+		"node-mocks-http": "^1.16.2",
 		"postcss": "^8",
 		"prettier": "^3.4.2",
 		"prettier-plugin-tailwindcss": "^0.6.11",
