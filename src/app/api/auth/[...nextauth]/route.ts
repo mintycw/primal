@@ -17,7 +17,7 @@ declare module "next-auth" {
 	}
 }
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
 	providers: [
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -60,7 +60,6 @@ export const authOptions: NextAuthOptions = {
 	secret: process.env.NEXTAUTH_SECRET!,
 };
 
-// Define the named export for Next.js App Router
 const handler = NextAuth(authOptions);
-export const GET = handler;
-export const POST = handler;
+export { handler as GET, handler as POST };
+export default handler;
