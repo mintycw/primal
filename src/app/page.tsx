@@ -1,7 +1,7 @@
 import Feed from "@/components/Feed";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth/authOptions";
 import SignOut from "@/components/SignOut";
 
 export const dynamic = "force-dynamic";
