@@ -14,7 +14,7 @@ function Page() {
 		if (session) {
 			router.push(`/user/${session.user?._id}`);
 		}
-	}, [session]);
+	}, [router, session]);
 
 	return session ? (
 		<div>

@@ -1,4 +1,5 @@
 import { TClip } from "@/types/clip";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -16,7 +17,15 @@ export default function Clip({ clip, handleDelete }: ClipProps) {
 		<div className="block bg-slate-900 p-2">
 			<div className="items-row flex">
 				<h1>{clip.user?.name}</h1>
-				<img src={clip.user?.image ?? ""} referrerPolicy="no-referrer" />
+				<div className="relative size-10 p-1">
+					<Image
+						src={clip.user?.image ?? ""}
+						alt="Profile Picture"
+						referrerPolicy="no-referrer"
+						fill
+						className="rounded-full"
+					/>
+				</div>
 			</div>
 			<h1>{clip.title}</h1>
 			<p>{clip.description}</p>
