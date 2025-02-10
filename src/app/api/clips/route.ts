@@ -24,13 +24,12 @@ export async function GET() {
 		await connectToDatabase();
 
 		const clips = await Clip.find().sort({ createdAt: -1 }).populate("user", "name image");
+
 		const clipsWithData = clips.map((clip) => {
-			// generate dynamic url
+			// Generates the dynamic URL
 			const videoUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${clip.objectName}`;
 			return { ...clip.toObject(), videoUrl };
 		});
-
-		console.log("Clips fetched:", clipsWithData);
 
 		return NextResponse.json(clipsWithData);
 	} catch (error: unknown) {
@@ -52,6 +51,7 @@ export async function POST(req: Request) {
 		const title = formData.get("title") as string;
 		const description = formData.get("description") as string;
 		const file = formData.get("content") as File;
+
 		const bucketName = process.env.S3_BUCKET;
 		const enableCompression = process.env.VIDEO_COMPRESSION === "true";
 		const localCompression = process.env.LOCAL_VIDEO_COMPRESSION === "true";
@@ -70,24 +70,31 @@ export async function POST(req: Request) {
 
 		if (enableCompression && localCompression) {
 			objectName = `defaultUser/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
+
 			// Perform local compression
 			console.log("Compressing video locally...");
+
 			await compressVideoOnNextJS(file);
+
 			console.log("Video compressed locally.");
 		} else if (enableCompression) {
 			objectName = `defaultUser/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
+
 			const compressionEndpoint = process.env.VIDEO_COMPRESSION_ENDPOINT;
+
 			if (!compressionEndpoint) {
 				throw new Error(
 					"Video compression endpoint is not defined in environment variables."
 				);
 			}
+
 			// Compress video on endpoint (can be changed to compressVideoOnNextJS but not recommended)
 			await sendEndpointForCompression(file, compressionEndpoint);
+
 			console.log("Video is being compressed...");
 		} else {
-			// origninal video
-			objectName = `defaultUser/${Date.now()}-${file.name}`; // location and name
+			// Original video
+			objectName = `defaultUser/${Date.now()}-${file.name}`; // Location and name
 			console.log("Using original video without compression.");
 		}
 
@@ -98,7 +105,7 @@ export async function POST(req: Request) {
 			ContentType: file.type,
 		});
 
-		const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 uur geldig
+		const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Expires in 1 hour
 
 		await connectToDatabase();
 
@@ -133,6 +140,7 @@ async function sendEndpointForCompression(
 ): Promise<Buffer> {
 	try {
 		const form = new FormData();
+
 		form.append("video", new Blob([await file.arrayBuffer()]), file.name);
 
 		const response = await fetch(`${compressionEndpoint}/compress`, {
@@ -157,6 +165,7 @@ async function sendEndpointForCompression(
 async function compressVideoOnNextJS(file: File): Promise<Buffer> {
 	const tempInputPath = path.join("/tmp", file.name);
 	const tempOutputPath = path.join("/tmp", `compressed-${file.name}`);
+
 	const localCodec = process.env.LOCAL_VIDEO_CODEC;
 
 	if (!localCodec) {

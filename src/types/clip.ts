@@ -14,12 +14,11 @@ export type TClip = {
 	updatedAt: Date;
 };
 
-export type TNewClip = Omit<
-	TClip,
-	"_id" | "clipId" | "uploadUrl" | "videoUrl" | "createdAt" | "updatedAt" | "objectName"
->;
-
-export type TClipUpdate = {
+export type TNewClip = {
+	user: string;
 	title: string;
+	content: string;
 	description: string;
 };
+
+export type TClipUpdate = Omit<TNewClip, "user" | "content">;

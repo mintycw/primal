@@ -1,6 +1,5 @@
 import { getClips } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
-import Link from "next/link";
 import Clip from "./Clip";
 
 export default async function Feed() {

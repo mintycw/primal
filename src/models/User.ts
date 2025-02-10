@@ -1,5 +1,5 @@
-import { TNewUser } from "@/types/user";
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { TNewUser } from "@/types/user";
 
 type UserDocument = Omit<TNewUser, "_id"> & Document;
 

@@ -8,22 +8,27 @@ import s3 from "@/lib/db/s3";
 export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
+
 		const { id } = await params;
+
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
 
 		const { title, description } = await req.json();
+
 		if (!title || !description) {
 			return NextResponse.json({ error: "Invalid data provided" }, { status: 400 });
 		}
 
 		const clip = await Clip.findById(id);
+
 		if (!clip) {
 			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
 		}
 
 		await Clip.findByIdAndUpdate(id, { title, description });
+
 		return NextResponse.json(clip, { status: 200 });
 	} catch (error: unknown) {
 		console.error("Error updating clip:", error);
@@ -35,11 +40,15 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
+
 		const { id } = await params;
-		const clip = await Clip.findOne({ _id: id }).populate("user", "name image");
+
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
+
+		const clip = await Clip.findOne({ _id: id }).populate("user", "name image");
+
 		if (!clip) {
 			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
 		}
@@ -54,12 +63,15 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 export async function DELETE(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
+
 		const { id } = await params;
-		const clip = await Clip.findByIdAndDelete(id);
 
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
 		}
+
+		const clip = await Clip.findByIdAndDelete(id);
+
 		if (!clip) {
 			return NextResponse.json({ error: "Clip not found" }, { status: 404 });
 		}

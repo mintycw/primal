@@ -1,7 +1,6 @@
 import { TClip } from "@/types/clip";
 import { getUserClips } from "@/lib/clips/fetchClips";
 import React from "react";
-import Link from "next/link";
 import Clip from "@/components/Clip";
 
 export default async function UserClips({ id }: { id: string }) {

@@ -11,7 +11,6 @@ type ClipDetailsProps = {
 export default function ClipDetails({ clip }: ClipDetailsProps) {
 	function handleDelete() {
 		deleteClip(clip._id);
-		console.log("Deleted clip with ID:", clip._id);
 	}
 
 	return <Clip clip={clip} handleDelete={handleDelete} />;

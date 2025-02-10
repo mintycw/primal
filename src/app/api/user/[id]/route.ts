@@ -2,20 +2,24 @@ import { connectToDatabase } from "@/lib/db/mongodb";
 import { NextResponse } from "next/server";
 import { Clip } from "@/models/Clip";
 import { RouteParams } from "@/types/param";
-import { populate } from "dotenv";
 
 export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
 		await connectToDatabase();
 		const { id } = await params;
-		console.log("Clips fetched:", id);
+
+		if (!id) {
+			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
+		}
 
 		const clips = await Clip.find({ user: id })
 			.populate("user", "name image")
 			.sort({ createdAt: -1 })
 			.exec();
 
-		console.log("Clips fetched:", clips);
+		if (!clips) {
+			return NextResponse.json({ error: "Clips not found" }, { status: 404 });
+		}
 
 		return NextResponse.json(clips);
 	} catch (error) {
