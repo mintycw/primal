@@ -1,4 +1,3 @@
-// __tests__/Button.test.tsx
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Button from "@/components/ButtonExample";

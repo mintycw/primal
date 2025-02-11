@@ -1,4 +1,3 @@
-// jest.config.ts
 import type { Config } from "@jest/types";
 import nextJest from "next/jest";
 

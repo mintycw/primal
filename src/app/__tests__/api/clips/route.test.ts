@@ -8,7 +8,18 @@ jest.mock("@/lib/db/mongodb", () => ({
 }));
 
 jest.mock("@/models/Clip", () => ({
-	find: jest.fn(),
+	Clip: {
+		find: jest.fn(),
+	},
+}));
+
+jest.mock("next/server", () => ({
+	NextResponse: {
+		json: jest.fn((data, init) => ({
+			status: init?.status || 200,
+			json: async () => data,
+		})),
+	},
 }));
 
 describe("GET function", () => {
