@@ -13,27 +13,3 @@ declare namespace NodeJS {
 		LOCAL_VIDEO_ENCODER: string | null;
 	}
 }
-
-declare module "node-mocks-http" {
-	export function createMocks(options?: {
-		method?: string;
-		url?: string;
-		headers?: Record<string, string>;
-		body?: any;
-		query?: Record<string, string>;
-	}): {
-		req: {
-			method: string;
-			url: string;
-			headers: Record<string, string>;
-			body: any;
-			query: Record<string, string>;
-		};
-		res: {
-			_getStatusCode: () => number;
-			_getData: () => string;
-			send: (data: any) => void;
-			status: (code: number) => void;
-		};
-	};
-}
