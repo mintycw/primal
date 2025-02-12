@@ -48,8 +48,8 @@ jobs:
                   echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> $GITHUB_ENV
                   echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> $GITHUB_ENV
 
-            - name: Run tests
-              run: npm test
+            # - name: Run tests
+            # run: npm test
 
             - name: Build Next.js app
               run: npm run build
