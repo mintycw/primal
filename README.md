@@ -3,14 +3,17 @@
 Create a .env file in the root directory or change .env.example to .env:
 
 ```enviromment
+NEXT_PUBLIC_API_BASE_URL=
 MONGODB_URI=
 S3_ENDPOINT=
 S3_BUCKET=
 S3_REGION=
 S3_ACCESS_KEY=
 S3_SECRET_KEY=
-VIDEO_COMPRESSION=false
+VIDEO_COMPRESSION=
 VIDEO_COMPRESSION_ENDPOINT=
+LOCAL_VIDEO_COMPRESSION=
+LOCAL_VIDEO_CODEC=
 ```
 
 Run the development server:
