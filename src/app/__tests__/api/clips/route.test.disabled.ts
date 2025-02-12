@@ -28,12 +28,14 @@ describe("GET function", () => {
 		const mockClips = [
 			{
 				_id: "1",
+				user: "1",
 				title: "Test Clip 1",
 				description: "This is a test clip",
 				objectName: "test-clip-1.mp4",
 				createdAt: new Date(),
 				toObject: jest.fn().mockReturnValue({
 					_id: "1",
+					user: "1",
 					title: "Test Clip 1",
 					description: "This is a test clip",
 					objectName: "test-clip-1.mp4",
