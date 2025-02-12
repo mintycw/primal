@@ -42,8 +42,8 @@ jobs:
                   echo "LOCAL_VIDEO_COMPRESSION=${{ secrets.LOCAL_VIDEO_COMPRESSION }}" >> $GITHUB_ENV
                   echo "LOCAL_VIDEO_CODEC=${{ secrets.LOCAL_VIDEO_CODEC }}" >> $GITHUB_ENV
 
-            # - name: Run tests
-            #   run: npm test
+            - name: Run tests
+              run: npm test
 
             - name: Build Next.js app
               run: npm run build
