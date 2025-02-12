@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 		let objectName: string; // location and name
 
 		if (enableCompression && localCompression) {
-			objectName = `defaultUser/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
+			objectName = `${session.user._id}/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
 
 			// Perform local compression
 			console.log("Compressing video locally...");
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
 			console.log("Video compressed locally.");
 		} else if (enableCompression) {
-			objectName = `defaultUser/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
+			objectName = `${session.user._id}/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
 
 			const compressionEndpoint = process.env.VIDEO_COMPRESSION_ENDPOINT;
 
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
 			console.log("Video is being compressed...");
 		} else {
 			// Original video
-			objectName = `defaultUser/${Date.now()}-${file.name}`; // Location and name
+			objectName = `${session.user._id}/${Date.now()}-${file.name}`; // Location and name
 			console.log("Using original video without compression.");
 		}
 
