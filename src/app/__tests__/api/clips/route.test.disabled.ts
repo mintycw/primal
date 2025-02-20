@@ -2,6 +2,10 @@ import { GET } from "@/app/api/clips/route"; // Pas het pad aan naar waar je bes
 import { connectToDatabase } from "@/lib/db/mongodb";
 import { Clip } from "@/models/Clip";
 
+test.skip("this test will be skipped", () => {
+	expect(true).toBe(false);
+});
+
 // Mock dependencies
 jest.mock("@/lib/db/mongodb", () => ({
 	connectToDatabase: jest.fn(),
