@@ -9,7 +9,6 @@ export const getClips = async (): Promise<TClip[]> => {
 		if (!res.ok) {
 			throw new Error("Failed to fetch clips");
 		}
-
 		return res.json();
 	} catch (error) {
 		console.error("Error fetching clips:", error);
@@ -36,5 +35,21 @@ export const getClip = async (id: string): Promise<TClip | null> => {
 	} catch (error) {
 		console.error("Error fetching clip:", error);
 		return null;
+	}
+};
+
+export const getUserClips = async (id: string): Promise<TClip[]> => {
+	try {
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/${id}`, {
+			cache: "no-cache",
+		});
+
+		if (!res.ok) {
+			throw new Error("Failed to fetch clips");
+		}
+		return res.json();
+	} catch (error) {
+		console.error("Error fetching clips:", error);
+		return [];
 	}
 };
