@@ -1,13 +1,19 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
+import { TNewUser } from "@/types/user";
 
-export interface IUser extends Document {
-	name: string;
-	email: string;
-}
+type UserDocument = Omit<TNewUser, "_id"> & Document;
 
-const UserSchema: Schema<IUser> = new mongoose.Schema({
-	name: { type: String, required: true },
-	email: { type: String, required: true, unique: true },
-});
+const UserSchema = new Schema<UserDocument>(
+	{
+		name: { type: String, required: true },
+		email: { type: String, required: true },
+		image: { type: String },
+		provider: { type: String, required: true },
+	},
+	{ timestamps: true }
+);
 
-export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+UserSchema.index({ email: 1, provider: 1 }, { unique: true });
+
+// Compile model from schema even if already exists or not
+export const User: Model<UserDocument> = mongoose.models.User || mongoose.model("User", UserSchema);

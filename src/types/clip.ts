@@ -1,5 +1,8 @@
+import { TUser } from "./user";
+
 export type TClip = {
 	_id: string;
+	user: TUser;
 	clipId: string;
 	title: string;
 	content?: string;
@@ -11,7 +14,11 @@ export type TClip = {
 	updatedAt: Date;
 };
 
-export type TNewClip = Omit<
-	TClip,
-	"_id" | "clipId" | "uploadUrl" | "videoUrl" | "createdAt" | "updatedAt" | "objectName"
->;
+export type TNewClip = {
+	user: string;
+	title: string;
+	content: string;
+	description: string;
+};
+
+export type TClipUpdate = Omit<TNewClip, "user" | "content">;

@@ -5,6 +5,7 @@ type ClipDocument = Omit<TClip, "_id"> & Document;
 
 const ClipSchema = new Schema<ClipDocument>(
 	{
+		user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 		title: {
 			type: String,
 			required: true,
@@ -26,6 +27,8 @@ const ClipSchema = new Schema<ClipDocument>(
 		timestamps: true,
 	}
 );
+
+ClipSchema.index({ user: 1, createdAt: -1 });
 
 // Compile model from schema even if already exists or not
 export const Clip: Model<ClipDocument> = mongoose.models.Clip || mongoose.model("Clip", ClipSchema);
