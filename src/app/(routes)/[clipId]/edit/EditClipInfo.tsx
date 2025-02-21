@@ -1,7 +1,7 @@
 "use client";
 
 import { putClip } from "@/lib/clips/postClip";
-import { TNewClip } from "@/types/clip";
+import { TClipUpdate } from "@/types/clip";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,7 +28,7 @@ export default function EditClipInfo({ id, title, description }: EditClipProps) 
 			return;
 		}
 
-		const editClip: TNewClip = {
+		const editClip: TClipUpdate = {
 			title: newTitle,
 			description: newDescription,
 		};
