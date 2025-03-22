@@ -25,10 +25,53 @@ export async function GET() {
 
 		const clips = await Clip.find().sort({ createdAt: -1 }).populate("user", "name image");
 
-		const clipsWithData = clips.map((clip) => {
+		// Get all reactions for all clips
+		const { Reaction } = await import("@/models/Reaction");
+		const allReactions = await Reaction.find().populate("user", "_id");
+
+		// Group reactions by clip
+		const reactionsByClip = allReactions.reduce((acc: Record<string, any[]>, reaction) => {
+			const clipId = reaction.clip.toString();
+			if (!acc[clipId]) {
+				acc[clipId] = [];
+			}
+			acc[clipId].push(reaction);
+			return acc;
+		}, {});
+
+		const clipsWithData = clips.map((clip: any) => {
 			// Generates the dynamic URL
 			const videoUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${clip.objectName}`;
-			return { ...clip.toObject(), videoUrl };
+
+			// Get reactions for this clip
+			const clipReactions = reactionsByClip[clip._id.toString()] || [];
+
+			// Group reactions by emoji and count them
+			const reactionCounts = clipReactions.reduce((acc: Record<string, any>, reaction) => {
+				const emoji = reaction.emoji;
+
+				if (!acc[emoji]) {
+					acc[emoji] = {
+						emoji,
+						count: 0,
+						users: [],
+					};
+				}
+
+				acc[emoji].count += 1;
+				acc[emoji].users.push(reaction.user._id.toString());
+
+				return acc;
+			}, {});
+
+			// Convert to array
+			const reactionCountsArray = Object.values(reactionCounts);
+
+			return {
+				...clip.toObject(),
+				videoUrl,
+				reactions: reactionCountsArray,
+			};
 		});
 
 		return NextResponse.json(clipsWithData);

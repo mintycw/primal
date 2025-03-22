@@ -1,4 +1,5 @@
 import { TUser } from "./user";
+import { TReactionCount } from "./reaction";
 
 export type TClip = {
 	_id: string;
@@ -10,6 +11,7 @@ export type TClip = {
 	uploadUrl: string;
 	videoUrl: string;
 	objectName: string;
+	reactions?: TReactionCount[];
 	createdAt: Date;
 	updatedAt: Date;
 };
