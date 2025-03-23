@@ -3,7 +3,8 @@ import { TClip } from "@/types/clip";
 export const getClips = async (): Promise<TClip[]> => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips`, {
-			cache: "no-cache",
+			cache: "no-store",
+			next: { revalidate: 0 },
 		});
 
 		if (!res.ok) {
@@ -23,7 +24,8 @@ export const getClip = async (id: string): Promise<TClip | null> => {
 		}
 
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips/${id}`, {
-			cache: "no-cache",
+			cache: "no-store",
+			next: { revalidate: 0 },
 		});
 
 		if (!res.ok) {
@@ -41,7 +43,8 @@ export const getClip = async (id: string): Promise<TClip | null> => {
 export const getUserClips = async (id: string): Promise<TClip[]> => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/${id}`, {
-			cache: "no-cache",
+			cache: "no-store",
+			next: { revalidate: 0 },
 		});
 
 		if (!res.ok) {

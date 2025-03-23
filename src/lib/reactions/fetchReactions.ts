@@ -12,6 +12,8 @@ export async function fetchReactions(clipId: string): Promise<TReactionCount[]> 
 			headers: {
 				"Content-Type": "application/json",
 			},
+			cache: "no-store", // Ensure we're not using cached data
+			next: { revalidate: 0 }, // Force revalidation on each request
 		});
 
 		if (!response.ok) {

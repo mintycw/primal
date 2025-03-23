@@ -6,6 +6,7 @@ import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "@/lib/db/s3";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
+import { TReactionCount } from "@/types/reaction";
 
 export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
@@ -63,29 +64,35 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 		const session = await getServerSession(authOptions);
 		const currentUserId = session?.user?._id;
 
+		// Convert currentUserId to string for proper comparison
+		const currentUserIdStr = currentUserId ? currentUserId.toString() : null;
+
 		// Group reactions by emoji and count them
-		const reactionsByEmoji = reactions.reduce((acc: Record<string, any>, reaction) => {
-			const emoji = reaction.emoji;
+		const reactionsByEmoji = reactions.reduce(
+			(acc: Record<string, TReactionCount>, reaction) => {
+				const emoji = reaction.emoji;
 
-			if (!acc[emoji]) {
-				acc[emoji] = {
-					emoji,
-					count: 0,
-					users: [],
-				};
-			}
+				if (!acc[emoji]) {
+					acc[emoji] = {
+						emoji,
+						count: 0,
+						users: [],
+					};
+				}
 
-			acc[emoji].count += 1;
-			acc[emoji].users.push(reaction.user._id.toString());
+				acc[emoji].count += 1;
+				acc[emoji].users.push(reaction.user._id.toString());
 
-			return acc;
-		}, {});
+				return acc;
+			},
+			{}
+		);
 
 		// Convert to array and add a flag for the current user's reactions
-		const reactionCounts = Object.values(reactionsByEmoji).map((count: any) => {
+		const reactionCounts = Object.values(reactionsByEmoji).map((count: TReactionCount) => {
 			return {
 				...count,
-				hasReacted: currentUserId ? count.users.includes(currentUserId) : false,
+				hasReacted: currentUserIdStr ? count.users.includes(currentUserIdStr) : false,
 			};
 		});
 

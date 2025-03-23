@@ -9,6 +9,8 @@ import fs from "fs";
 import path from "path";
 import { authOptions } from "@/lib/auth/authOptions";
 import { getServerSession } from "next-auth";
+import { TReactionCount } from "@/types/reaction";
+import { IReaction } from "@/models/Reaction";
 
 // Does not have to be changed unless we go beyond 1GB
 export const config = {
@@ -30,45 +32,73 @@ export async function GET() {
 		const allReactions = await Reaction.find().populate("user", "_id");
 
 		// Group reactions by clip
-		const reactionsByClip = allReactions.reduce((acc: Record<string, any[]>, reaction) => {
-			const clipId = reaction.clip.toString();
-			if (!acc[clipId]) {
-				acc[clipId] = [];
-			}
-			acc[clipId].push(reaction);
-			return acc;
-		}, {});
+		const reactionsByClip = allReactions.reduce(
+			(acc: Record<string, IReaction[]>, reaction) => {
+				const clipId = reaction.clip.toString();
+				if (!acc[clipId]) {
+					acc[clipId] = [];
+				}
+				acc[clipId].push(reaction);
+				return acc;
+			},
+			{}
+		);
 
-		const clipsWithData = clips.map((clip: any) => {
+		// Get the current user's session to check if they've reacted
+		const session = await getServerSession(authOptions);
+		const currentUserId = session?.user?._id;
+
+		// Convert currentUserId to string for proper comparison
+		const currentUserIdStr = currentUserId ? currentUserId.toString() : null;
+
+		const clipsWithData = clips.map((clip) => {
+			// Type assertion to access the properties we need
+			const typedClip = clip as unknown as {
+				objectName: string;
+				_id: { toString(): string };
+				toObject(): Record<string, unknown>;
+			};
 			// Generates the dynamic URL
-			const videoUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${clip.objectName}`;
+			const videoUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${typedClip.objectName}`;
 
 			// Get reactions for this clip
-			const clipReactions = reactionsByClip[clip._id.toString()] || [];
+			const clipReactions = reactionsByClip[typedClip._id.toString()] || [];
 
 			// Group reactions by emoji and count them
-			const reactionCounts = clipReactions.reduce((acc: Record<string, any>, reaction) => {
-				const emoji = reaction.emoji;
+			const reactionCounts = clipReactions.reduce(
+				(acc: Record<string, TReactionCount>, reaction) => {
+					const emoji = reaction.emoji;
 
-				if (!acc[emoji]) {
-					acc[emoji] = {
-						emoji,
-						count: 0,
-						users: [],
+					if (!acc[emoji]) {
+						acc[emoji] = {
+							emoji,
+							count: 0,
+							users: [],
+						};
+					}
+
+					acc[emoji].count += 1;
+					acc[emoji].users.push(reaction.user._id.toString());
+
+					return acc;
+				},
+				{}
+			);
+
+			// Convert to array and add a flag for the current user's reactions
+			const reactionCountsArray = Object.values(reactionCounts).map(
+				(count: TReactionCount) => {
+					return {
+						...count,
+						hasReacted: currentUserIdStr
+							? count.users.includes(currentUserIdStr)
+							: false,
 					};
 				}
-
-				acc[emoji].count += 1;
-				acc[emoji].users.push(reaction.user._id.toString());
-
-				return acc;
-			}, {});
-
-			// Convert to array
-			const reactionCountsArray = Object.values(reactionCounts);
+			);
 
 			return {
-				...clip.toObject(),
+				...typedClip.toObject(),
 				videoUrl,
 				reactions: reactionCountsArray,
 			};

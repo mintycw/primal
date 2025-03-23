@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { RouteParams } from "@/types/param";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
+import { TReactionCount } from "@/types/reaction";
 
 // Get reactions for a specific clip
 export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
@@ -20,7 +21,7 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 		const reactions = await Reaction.find({ clip: id }).populate("user", "name image _id");
 
 		// Group reactions by emoji and count them
-		const reactionCounts = reactions.reduce((acc: any, reaction) => {
+		const reactionCounts = reactions.reduce((acc: Record<string, TReactionCount>, reaction) => {
 			const emoji = reaction.emoji;
 
 			if (!acc[emoji]) {
@@ -41,11 +42,14 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 		const session = await getServerSession(authOptions);
 		const currentUserId = session?.user?._id;
 
+		// Convert currentUserId to string for proper comparison
+		const currentUserIdStr = currentUserId ? currentUserId.toString() : null;
+
 		// Convert to array and add a flag for the current user's reactions
-		const reactionCountsArray = Object.values(reactionCounts).map((count: any) => {
+		const reactionCountsArray = Object.values(reactionCounts).map((count: TReactionCount) => {
 			return {
 				...count,
-				hasReacted: currentUserId ? count.users.includes(currentUserId) : false,
+				hasReacted: currentUserIdStr ? count.users.includes(currentUserIdStr) : false,
 			};
 		});
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { TReactionCount } from "@/types/reaction";
 import { fetchReactions, toggleReaction } from "@/lib/reactions/fetchReactions";
 import { useSession } from "next-auth/react";
@@ -17,14 +17,23 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 	const [isLoading, setIsLoading] = useState<boolean>(initialReactions.length === 0);
 	const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
 
-	// Fetch reactions when component mounts if no initial reactions provided
-	useEffect(() => {
-		if (initialReactions.length === 0) {
-			loadReactions();
-		}
-	}, [clipId, initialReactions]);
+	// Update reactions with client-side session information
+	const updateReactionsWithClientSession = useCallback(
+		(reactionData: TReactionCount[]) => {
+			if (!session?.user?._id) return;
 
-	const loadReactions = async () => {
+			const userId = session.user._id.toString();
+			const updatedReactions = reactionData.map((reaction) => ({
+				...reaction,
+				hasReacted: reaction.users.includes(userId),
+			}));
+
+			setReactions(updatedReactions);
+		},
+		[session]
+	);
+
+	const loadReactions = useCallback(async () => {
 		setIsLoading(true);
 		try {
 			const fetchedReactions = await fetchReactions(clipId);
@@ -34,11 +43,22 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [clipId]);
+
+	// Fetch reactions when component mounts or when session changes
+	useEffect(() => {
+		if (initialReactions.length === 0) {
+			loadReactions();
+		} else if (session?.user?._id) {
+			// If we have initial reactions and a session, ensure the hasReacted flags are correct
+			// This is needed because the server might not have the same session info as the client
+			updateReactionsWithClientSession(initialReactions);
+		}
+	}, [clipId, initialReactions, session, loadReactions, updateReactionsWithClientSession]);
 
 	const handleReaction = async (emoji: string) => {
 		if (!session || !session.user?._id) {
-			// If not logged in, prompt to log in
+			// If not logged in, prompt to log in NOTE: This should be handled by the UI later..
 			alert("Please log in to react to clips");
 			return;
 		}
