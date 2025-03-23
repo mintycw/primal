@@ -2,10 +2,11 @@
  * @jest-environment node
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { POST } from "../reactions/route";
 import { connectToDatabase } from "@/lib/db/mongodb";
 import { getServerSession } from "next-auth";
+import { Reaction } from "@/models/Reaction"; // Changed require to import
 
 // Mock the database connection
 jest.mock("@/lib/db/mongodb", () => ({
@@ -23,24 +24,18 @@ jest.mock("@/lib/auth/authOptions", () => ({
 }));
 
 // Mock the constructor for Reaction
-const mockReactionSave = jest.fn().mockResolvedValue({ _id: "newReaction" });
-jest.mock(
-	"@/models/Reaction",
-	() => {
-		// Create a mock constructor
-		function MockReaction() {
-			return { save: mockReactionSave };
-		}
+jest.mock("@/models/Reaction", () => {
+	const mockReactionSave = jest.fn().mockResolvedValue({ _id: "newReaction" });
 
-		// Add static methods
-		MockReaction.find = jest.fn();
-		MockReaction.findOne = jest.fn();
-		MockReaction.findByIdAndDelete = jest.fn();
+	class MockReaction {
+		save = mockReactionSave;
+		static find = jest.fn();
+		static findOne = jest.fn();
+		static findByIdAndDelete = jest.fn();
+	}
 
-		return { Reaction: MockReaction };
-	},
-	{ virtual: true }
-);
+	return { Reaction: MockReaction };
+});
 
 describe("Reactions API", () => {
 	const mockSession = {
@@ -60,11 +55,8 @@ describe("Reactions API", () => {
 
 	describe("POST /api/reactions", () => {
 		test("adds a new reaction when it does not exist", async () => {
-			// Import the mocked Reaction model
-			const { Reaction } = require("@/models/Reaction");
-
 			// Mock Reaction.findOne to return null (reaction doesn't exist)
-			Reaction.findOne.mockResolvedValue(null);
+			(Reaction.findOne as jest.Mock).mockResolvedValue(null);
 
 			// Create mock request with body
 			const req = new NextRequest("http://localhost/api/reactions", {
@@ -83,11 +75,8 @@ describe("Reactions API", () => {
 		});
 
 		test("removes an existing reaction", async () => {
-			// Import the mocked Reaction model
-			const { Reaction } = require("@/models/Reaction");
-
 			// Mock Reaction.findOne to return an existing reaction
-			Reaction.findOne.mockResolvedValue({
+			(Reaction.findOne as jest.Mock).mockResolvedValue({
 				_id: "existingReaction",
 				emoji: "❤️",
 			});
