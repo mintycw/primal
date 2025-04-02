@@ -2,6 +2,7 @@ import { TClip } from "@/types/clip";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import ReactionBar from "./ReactionBar";
 
 type ClipProps = {
 	clip: TClip;
@@ -35,6 +36,10 @@ export default function Clip({ clip, handleDelete }: ClipProps) {
 			</video>
 			<p>Created: {clip.createdAt.toString()}</p>
 			<p>Updated: {clip.updatedAt.toString()}</p>
+
+			{/* Reaction Bar */}
+			<ReactionBar clipId={clip._id} initialReactions={clip.reactions} />
+
 			{handleDelete && (
 				<>
 					<button

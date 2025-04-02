@@ -16,15 +16,41 @@ declare module "next-auth" {
 	}
 }
 
+// Error handling for enviromment variables
+const googleClientId = process.env.GOOGLE_CLIENT_ID as string;
+if (!googleClientId) {
+	throw new Error("Please define the GOOGLE_CLIENT_ID environment variable.");
+}
+
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET as string;
+if (!googleClientSecret) {
+	throw new Error("Please define the GOOGLE_CLIENT_SECRET environment variable.");
+}
+
+const discordClientId = process.env.DISCORD_CLIENT_ID as string;
+if (!discordClientId) {
+	throw new Error("Please define the DISCORD_CLIENT_ID environment variable.");
+}
+
+const discordClientSecret = process.env.DISCORD_CLIENT_SECRET as string;
+if (!discordClientSecret) {
+	throw new Error("Please define the DISCORD_CLIENT_SECRET environment variable.");
+}
+
+const nextAuthSecret = process.env.NEXTAUTH_SECRET as string;
+if (!nextAuthSecret) {
+	throw new Error("Please define the NEXTAUTH_SECRET environment variable.");
+}
+
 export const authOptions: NextAuthOptions = {
 	providers: [
 		GoogleProvider({
-			clientId: process.env.GOOGLE_CLIENT_ID!,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+			clientId: googleClientId!,
+			clientSecret: googleClientSecret!,
 		}),
 		DiscordProvider({
-			clientId: process.env.DISCORD_CLIENT_ID!,
-			clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+			clientId: discordClientId!,
+			clientSecret: discordClientSecret!,
 		}),
 	],
 	callbacks: {
@@ -93,5 +119,5 @@ export const authOptions: NextAuthOptions = {
 			return true;
 		},
 	},
-	secret: process.env.NEXTAUTH_SECRET!,
+	secret: nextAuthSecret!,
 };
