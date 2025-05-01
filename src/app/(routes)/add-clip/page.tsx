@@ -18,8 +18,8 @@ export default function AddClip() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!title || !description || !content) {
-			alert("All fields are required");
+		if (!title || !content) {
+			alert("Title field and video clip is required");
 			return;
 		}
 		if (content.size > MAX_FILE_SIZE) {
@@ -64,7 +64,6 @@ export default function AddClip() {
 					id="description"
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
-					required
 					disabled={loading}
 				/>
 			</div>

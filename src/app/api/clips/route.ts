@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import s3 from "@/lib/db/s3";
@@ -23,7 +23,7 @@ export const config = {
 
 export async function GET() {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const clips = await Clip.find().sort({ createdAt: -1 }).populate("user", "name image");
 
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
 		const formData = await req.formData();
 
 		const title = formData.get("title") as string;
-		const description = formData.get("description") as string;
+		const description = formData.get("description") as string | null;
 		const file = formData.get("content") as File;
 
 		const bucketName = process.env.S3_BUCKET;
@@ -133,9 +133,15 @@ export async function POST(req: Request) {
 			throw new Error("S3_BUCKET is not defined in environment variables.");
 		}
 
-		if (!title || !description || !file) {
-			return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+		if (!title || !file) {
+			return NextResponse.json(
+				{ error: "Title field and video clip is required" },
+				{ status: 400 }
+			);
 		}
+
+		// Check if MongoDB server is online
+		await checkMongodbConnection();
 
 		console.log(`Video compression is ${enableCompression ? "enabled" : "disabled"}`);
 
@@ -179,8 +185,6 @@ export async function POST(req: Request) {
 		});
 
 		const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Expires in 1 hour
-
-		await connectToDatabase();
 
 		// Save metadata in MongoDB
 		const newClip = new Clip({

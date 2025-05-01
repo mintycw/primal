@@ -3,15 +3,23 @@ import { TClip } from "@/types/clip";
 import Clip from "./Clip";
 
 export default async function Feed() {
-	const clips: TClip[] = await getClips();
+	let clips: TClip[] = [];
+
+	try {
+		clips = await getClips();
+	} catch {
+		alert("Error fetching clips");
+	}
 
 	return (
 		<div>
 			<p>Feed page</p>
 			<div>
-				{clips.map((clip) => (
-					<Clip key={clip._id} clip={clip} />
-				))}
+				{clips.length > 0 ? (
+					clips.map((clip) => <Clip key={clip._id} clip={clip} />)
+				) : (
+					<p>No clips available.</p>
+				)}
 			</div>
 		</div>
 	);
