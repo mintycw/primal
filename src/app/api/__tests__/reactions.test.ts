@@ -4,13 +4,13 @@
 
 import { NextRequest } from "next/server";
 import { POST } from "../reactions/route";
-import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
+import { connectToDatabase } from "@/lib/db/mongodb";
 import { getServerSession } from "next-auth";
 import { Reaction } from "@/models/Reaction"; // Changed require to import
 
 // Mock the database connection
 jest.mock("@/lib/db/mongodb", () => ({
-	checkMongodbConnection: jest.fn(),
+	connectToDatabase: jest.fn(),
 }));
 
 // Mock next-auth
@@ -49,7 +49,7 @@ describe("Reactions API", () => {
 		jest.clearAllMocks();
 
 		// Setup default mock implementations
-		(checkMongodbConnection as jest.Mock).mockResolvedValue(undefined);
+		(connectToDatabase as jest.Mock).mockResolvedValue(undefined);
 		(getServerSession as jest.Mock).mockResolvedValue(mockSession);
 	});
 

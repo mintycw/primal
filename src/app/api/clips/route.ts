@@ -3,7 +3,7 @@ import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import s3 from "@/lib/db/s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
@@ -177,34 +177,51 @@ export async function POST(req: Request) {
 			console.log("Using original video without compression.");
 		}
 
-		// Generates presigned URL for upload
-		const command = new PutObjectCommand({
-			Bucket: bucketName,
-			Key: objectName,
-			ContentType: file.type,
-		});
+		try {
+			// Check S3 bucket is accessibility
+			const headBucketCommand = new HeadBucketCommand({
+				Bucket: bucketName,
+			});
 
-		const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Expires in 1 hour
+			// Throws an error if the bucket doesn't exist or is not accessible
+			await s3.send(headBucketCommand);
+			console.log("S3 bucket is accessible");
 
-		// Save metadata in MongoDB
-		const newClip = new Clip({
-			title,
-			description,
-			videoUrl: `${process.env.S3_ENDPOINT}/${bucketName}/${objectName}`,
-			objectName,
-			user: session.user._id,
-		});
+			// Generates presigned URL for upload
+			const command = new PutObjectCommand({
+				Bucket: bucketName,
+				Key: objectName,
+				ContentType: file.type,
+			});
 
-		const savedClip = await newClip.save();
+			const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Expires in 1 hour
 
-		return NextResponse.json(
-			{
-				message: "Clip created successfully",
-				clipId: savedClip._id,
-				uploadUrl: signedUrl,
-			},
-			{ status: 201 }
-		);
+			// Save metadata in MongoDB
+			const newClip = new Clip({
+				title,
+				description,
+				videoUrl: `${process.env.S3_ENDPOINT}/${bucketName}/${objectName}`,
+				objectName,
+				user: session.user._id,
+			});
+
+			const savedClip = await newClip.save();
+
+			return NextResponse.json(
+				{
+					message: "Clip created successfully",
+					clipId: savedClip._id,
+					uploadUrl: signedUrl,
+				},
+				{ status: 201 }
+			);
+		} catch (s3Error) {
+			console.error("Error accessing S3 bucket:", s3Error);
+			return NextResponse.json(
+				{ error: "Bulk database is currently unavailable. Please try again later." },
+				{ status: 503 }
+			);
+		}
 	} catch (error) {
 		console.error("Error creating clip:", error);
 		return NextResponse.json({ error: "Failed to create clip" }, { status: 500 });
