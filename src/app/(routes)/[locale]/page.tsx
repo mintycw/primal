@@ -1,17 +1,21 @@
 import Feed from "@/components/Feed";
 import { getServerSession } from "next-auth";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { authOptions } from "@/lib/auth/authOptions";
 import SignOut from "@/components/SignOut";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
 	const session = await getServerSession(authOptions);
 
+	const t = await getTranslations("HomePage");
+
 	return (
 		<>
-			<h1>Main</h1>
+			<h1>{t("main")}</h1>
 			{session ? (
 				<>
 					<Link href="/add-clip" className="rounded-sm bg-gray-500 px-4 py-2 text-white">
