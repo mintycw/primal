@@ -1,6 +1,6 @@
 import { TClip } from "@/types/clip";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import React from "react";
 import ReactionBar from "./ReactionBar";
 
