@@ -1,11 +1,11 @@
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { User } from "@/models/User";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth/authOptions";
 
 export async function GET() {
-	await connectToDatabase();
+	await checkMongodbConnection();
 	const session = await getServerSession(authOptions);
 
 	if (!session) {

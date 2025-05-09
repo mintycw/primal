@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Reaction } from "@/models/Reaction";
 import { NextResponse } from "next/server";
 import { RouteParams } from "@/types/param";
@@ -9,7 +9,7 @@ import { TReactionCount } from "@/types/reaction";
 // Get reactions for a specific clip
 export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const { id } = await params;
 

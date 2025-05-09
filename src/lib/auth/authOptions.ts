@@ -1,17 +1,18 @@
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { NextAuthOptions } from "next-auth";
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { User } from "@/models/User";
+import { AuthProvider } from "@/types/user";
 
 declare module "next-auth" {
 	interface Session {
 		user: {
-			_id?: string;
+			_id: string;
+			email: string;
+			provider: AuthProvider;
 			name?: string | null;
-			email?: string | null;
 			image?: string | null;
-			provider?: string | null;
 		};
 	}
 }
@@ -64,14 +65,16 @@ export const authOptions: NextAuthOptions = {
 		},
 		// Handle session and add provider and _id to the session object
 		async session({ session, token }) {
-			await connectToDatabase();
+			await checkMongodbConnection();
 
 			console.log(session, token);
 
-			// Ensure email exists in session before querying the database
-			if (!session.user?.email) {
-				console.error("No email in session.");
-				return session;
+			// Ensure email and provider exists in session before querying the database
+			if (!session.user?.email || !token.provider) {
+				console.error(
+					`Missing email or provider in session or token. Email: ${session.user?.email}, Provider: ${token.provider}`
+				);
+				throw new Error("Invalid session: missing email or provider.");
 			}
 
 			// Find the user in the database by email and provider
@@ -80,13 +83,14 @@ export const authOptions: NextAuthOptions = {
 				provider: token.provider, // Use provider from the token
 			})) as { _id: string; provider: string } | null;
 
-			// If a matching user is found, add _id and provider to session.user
-			if (dbUser && session.user) {
-				session.user._id = dbUser._id.toString();
-				session.user.provider = dbUser.provider;
-			} else {
-				console.error("User not found in the database.");
+			if (!dbUser) {
+				console.error("User not found in database.");
+				throw new Error("Invalid session: user not found.");
 			}
+
+			// Add user id and provider to session
+			session.user._id = dbUser._id.toString();
+			session.user.provider = dbUser.provider as AuthProvider;
 
 			return session;
 		},
@@ -97,12 +101,15 @@ export const authOptions: NextAuthOptions = {
 				return false;
 			}
 
-			await connectToDatabase();
+			await checkMongodbConnection();
+
+			// Cast the provider to enum
+			const provider = account.provider as AuthProvider;
 
 			// Check if a user with the same email and provider already exists
 			const existingUser = await User.findOne({
 				email: user.email,
-				provider: account.provider,
+				provider: provider,
 			});
 
 			// If the user doesn't exist, create a new one
@@ -111,7 +118,7 @@ export const authOptions: NextAuthOptions = {
 					name: user.name,
 					email: user.email,
 					image: user.image,
-					provider: account.provider,
+					provider: provider,
 				});
 				await newUser.save();
 			}

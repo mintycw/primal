@@ -1,6 +1,5 @@
 import { TClip, TClipUpdate } from "@/types/clip";
 
-// TODO: return is set to any for now, change to TClip
 export const postClip = async (formData: FormData, content: File): Promise<TClip | null> => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips`, {
@@ -12,7 +11,6 @@ export const postClip = async (formData: FormData, content: File): Promise<TClip
 			throw new Error("Failed to create clip");
 		}
 
-		// TODO: Make sure to return object that fits the TClip type // DONE :)
 		const data: TClip = await res.json();
 		const uploadUrl = data.uploadUrl;
 
@@ -25,15 +23,19 @@ export const postClip = async (formData: FormData, content: File): Promise<TClip
 			body: content, // Upload the file content
 		});
 
-		if (uploadRes.ok) {
-			return data;
-		} else {
+		// Check if clip upload was successful
+		if (!uploadRes.ok) {
+			await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips/${data._id}`, {
+				method: "DELETE", // Delete the clip from the database if upload fails
+			});
 			const errorText = await uploadRes.text();
 			console.error("Upload response error:", uploadRes.status, errorText);
-			throw new Error("Failed to upload video to bulk database");
+			throw new Error("Failed to upload clip to bulk database");
 		}
+
+		return data;
 	} catch (error) {
-		console.error("Error creating clip:", error);
+		console.error("Error posting clip:", error);
 		return null;
 	}
 };

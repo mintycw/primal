@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Reaction } from "@/models/Reaction";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth/authOptions";
 // Get all reactions (mainly for testing)
 export async function GET() {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const reactions = await Reaction.find()
 			.populate("user", "name image")
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: "User is not authenticated" }, { status: 401 });
 		}
 
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const { clipId, emoji } = await req.json();
 

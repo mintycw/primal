@@ -20,7 +20,7 @@ export type TNewClip = {
 	user: string;
 	title: string;
 	content: string;
-	description: string;
+	description?: string;
 };
 
 export type TClipUpdate = Omit<TNewClip, "user" | "content">;

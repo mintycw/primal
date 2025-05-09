@@ -1,9 +1,9 @@
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import s3 from "@/lib/db/s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
@@ -23,7 +23,7 @@ export const config = {
 
 export async function GET() {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const clips = await Clip.find().sort({ createdAt: -1 }).populate("user", "name image");
 
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
 		const formData = await req.formData();
 
 		const title = formData.get("title") as string;
-		const description = formData.get("description") as string;
+		const description = formData.get("description") as string | null;
 		const file = formData.get("content") as File;
 
 		const bucketName = process.env.S3_BUCKET;
@@ -133,9 +133,15 @@ export async function POST(req: Request) {
 			throw new Error("S3_BUCKET is not defined in environment variables.");
 		}
 
-		if (!title || !description || !file) {
-			return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+		if (!title || !file) {
+			return NextResponse.json(
+				{ error: "Title field and video clip is required" },
+				{ status: 400 }
+			);
 		}
+
+		// Check if MongoDB server is online
+		await checkMongodbConnection();
 
 		console.log(`Video compression is ${enableCompression ? "enabled" : "disabled"}`);
 
@@ -171,36 +177,51 @@ export async function POST(req: Request) {
 			console.log("Using original video without compression.");
 		}
 
-		// Generates presigned URL for upload
-		const command = new PutObjectCommand({
-			Bucket: bucketName,
-			Key: objectName,
-			ContentType: file.type,
-		});
+		try {
+			// Check S3 bucket is accessibility
+			const headBucketCommand = new HeadBucketCommand({
+				Bucket: bucketName,
+			});
 
-		const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Expires in 1 hour
+			// Throws an error if the bucket doesn't exist or is not accessible
+			await s3.send(headBucketCommand);
+			console.log("S3 bucket is accessible");
 
-		await connectToDatabase();
+			// Generates presigned URL for upload
+			const command = new PutObjectCommand({
+				Bucket: bucketName,
+				Key: objectName,
+				ContentType: file.type,
+			});
 
-		// Save metadata in MongoDB
-		const newClip = new Clip({
-			title,
-			description,
-			videoUrl: `${process.env.S3_ENDPOINT}/${bucketName}/${objectName}`,
-			objectName,
-			user: session.user._id,
-		});
+			const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Expires in 1 hour
 
-		const savedClip = await newClip.save();
+			// Save metadata in MongoDB
+			const newClip = new Clip({
+				title,
+				description,
+				videoUrl: `${process.env.S3_ENDPOINT}/${bucketName}/${objectName}`,
+				objectName,
+				user: session.user._id,
+			});
 
-		return NextResponse.json(
-			{
-				message: "Clip created successfully",
-				clipId: savedClip._id,
-				uploadUrl: signedUrl,
-			},
-			{ status: 201 }
-		);
+			const savedClip = await newClip.save();
+
+			return NextResponse.json(
+				{
+					message: "Clip created successfully",
+					clipId: savedClip._id,
+					uploadUrl: signedUrl,
+				},
+				{ status: 201 }
+			);
+		} catch (s3Error) {
+			console.error("Error accessing S3 bucket:", s3Error);
+			return NextResponse.json(
+				{ error: "Bulk database is currently unavailable. Please try again later." },
+				{ status: 503 }
+			);
+		}
 	} catch (error) {
 		console.error("Error creating clip:", error);
 		return NextResponse.json({ error: "Failed to create clip" }, { status: 500 });

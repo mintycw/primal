@@ -1,11 +1,11 @@
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { NextResponse } from "next/server";
 import { Clip } from "@/models/Clip";
 import { RouteParams } from "@/types/param";
 
 export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 		const { id } = await params;
 
 		if (!id) {

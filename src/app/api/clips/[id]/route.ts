@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/lib/db/mongodb";
+import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import { RouteParams } from "@/types/param";
@@ -10,7 +10,7 @@ import { TReactionCount } from "@/types/reaction";
 
 export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const { id } = await params;
 
@@ -42,7 +42,7 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 // Specific clip fetch
 export async function GET(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const { id } = await params;
 
@@ -111,7 +111,7 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 
 export async function DELETE(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
-		await connectToDatabase();
+		await checkMongodbConnection();
 
 		const { id } = await params;
 
