@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { Link } from "@/i18n/navigation";
 import { authOptions } from "@/lib/auth/authOptions";
 import SignOut from "@/components/SignOut";
-import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
