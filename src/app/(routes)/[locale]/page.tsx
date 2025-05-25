@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import Feed from "@/components/Feed";
 import { getServerSession } from "next-auth";
 import { Link } from "@/i18n/navigation";
@@ -14,6 +15,7 @@ export default async function Home() {
 
 	return (
 		<>
+			<Header />
 			<h1>{t("main")}</h1>
 			{session ? (
 				<>
