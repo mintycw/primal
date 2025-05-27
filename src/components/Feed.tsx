@@ -1,6 +1,6 @@
 import { getClips } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
-import Clip from "./Clip";
+import Clip from "./clips/Clip";
 
 export default async function Feed() {
 	let clips: TClip[] = [];
@@ -12,9 +12,8 @@ export default async function Feed() {
 	}
 
 	return (
-		<div>
-			<p>Feed page</p>
-			<div>
+		<div className="flex overflow-y-auto">
+			<div className="flex flex-col p-4">
 				{clips.length > 0 ? (
 					clips.map((clip) => <Clip key={clip._id} clip={clip} />)
 				) : (

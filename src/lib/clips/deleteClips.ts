@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 type TDeleteClip = (id: string) => Promise<void>;
 
 export const deleteClip: TDeleteClip = async (id) => {
@@ -5,7 +7,9 @@ export const deleteClip: TDeleteClip = async (id) => {
 		throw new Error("Missing ID parameter");
 	}
 
-	const confirmed = confirm("Are you sure you want to remove this clip?");
+	const t = useTranslations("ClipComponent");
+
+	const confirmed = confirm(t("confirmDelete"));
 
 	if (!confirmed) {
 		return;

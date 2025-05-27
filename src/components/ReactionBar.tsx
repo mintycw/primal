@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { TReactionCount } from "@/types/reaction";
 import { fetchReactions, toggleReaction } from "@/lib/reactions/fetchReactions";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 const COMMON_EMOJIS = ["🔥", "❤️", "😂", "😮", "👏", "💀"];
 
@@ -16,6 +17,13 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 	const [reactions, setReactions] = useState<TReactionCount[]>(initialReactions);
 	const [isLoading, setIsLoading] = useState<boolean>(initialReactions.length === 0);
 	const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
+	const [hasInitialized, setHasInitialized] = useState(false);
+
+	const t = useTranslations("ReactionBarComponent");
+
+	function handleShowEmojiPicker(e: React.MouseEvent<HTMLButtonElement>) {
+		setShowEmojiPicker((prev) => !prev);
+	}
 
 	// Update reactions with client-side session information
 	const updateReactionsWithClientSession = useCallback(
@@ -45,18 +53,27 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 		}
 	}, [clipId]);
 
-	// Fetch reactions when component mounts or when session changes
 	useEffect(() => {
+		if (hasInitialized) return;
+
 		if (initialReactions.length === 0) {
 			loadReactions();
+			setHasInitialized(true);
 		} else if (session?.user?._id) {
-			// If we have initial reactions and a session, ensure the hasReacted flags are correct
-			// This is needed because the server might not have the same session info as the client
 			updateReactionsWithClientSession(initialReactions);
+			setHasInitialized(true);
 		}
-	}, [clipId, initialReactions, session, loadReactions, updateReactionsWithClientSession]);
+	}, [
+		clipId,
+		initialReactions,
+		session,
+		reactions.length,
+		loadReactions,
+		updateReactionsWithClientSession,
+		hasInitialized,
+	]);
 
-	const handleReaction = async (emoji: string) => {
+	const handleReaction = async (e: React.MouseEvent<HTMLButtonElement>, emoji: string) => {
 		if (!session || !session.user?._id) {
 			// If not logged in, prompt to log in NOTE: This should be handled by the UI later..
 			alert("Please log in to react to clips");
@@ -128,21 +145,19 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 	};
 
 	if (isLoading) {
-		return <div className="mt-2 text-sm text-gray-500">Loading reactions...</div>;
+		return <div className="mt-2 text-sm text-gray-500">{t("loading")}</div>;
 	}
 
 	return (
-		<div className="mt-3 border-t border-gray-700 pt-2">
+		<div className="z-10 cursor-default" onClick={(e) => e.stopPropagation()}>
 			<div className="flex flex-wrap gap-2">
 				{/* Display existing reactions */}
 				{reactions.map((reaction) => (
 					<button
 						key={reaction.emoji}
-						onClick={() => handleReaction(reaction.emoji)}
-						className={`flex items-center rounded-full px-3 py-1 text-sm ${
-							reaction.hasReacted
-								? "bg-blue-600 text-white"
-								: "bg-gray-800 text-gray-300 hover:bg-gray-700"
+						onClick={(e) => handleReaction(e, reaction.emoji)}
+						className={`flex items-center rounded-full px-3 py-1 text-sm text-stone-200 shadow duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 ${
+							reaction.hasReacted ? "bg-stone-700" : "bg-stone-800 text-stone-200"
 						}`}
 					>
 						<span className="mr-1">{reaction.emoji}</span>
@@ -152,24 +167,24 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 
 				{/* Add reaction button */}
 				<button
-					onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-					className="flex items-center rounded-full bg-gray-800 px-3 py-1 text-sm text-gray-300 hover:bg-gray-700"
+					onClick={handleShowEmojiPicker}
+					className="flex items-center rounded-full bg-stone-800 px-3 py-1 text-sm text-stone-200 shadow duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90"
 				>
 					<span className="mr-1">+</span>
-					<span>Add Reaction</span>
+					<span>{t("addReaction")}</span>
 				</button>
 			</div>
 
 			{/* Emoji picker */}
 			{showEmojiPicker && (
-				<div className="mt-2 flex flex-wrap gap-2 rounded-md bg-gray-800 p-2">
+				<div className="z-10 mt-2 flex flex-wrap gap-2 rounded-full bg-stone-800 px-2 py-1 shadow-lg duration-300 ease-in-out select-none hover:cursor-default hover:shadow-xl">
 					{COMMON_EMOJIS.map((emoji) => (
 						<button
 							key={emoji}
-							onClick={() => handleReaction(emoji)}
-							className="cursor-pointer text-xl hover:scale-125"
+							onClick={(e) => handleReaction(e, emoji)}
+							className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-transform duration-100 hover:scale-125"
 						>
-							{emoji}
+							<span className="text-2xl">{emoji}</span>
 						</button>
 					))}
 				</div>

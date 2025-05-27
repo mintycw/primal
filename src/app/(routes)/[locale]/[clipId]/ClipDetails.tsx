@@ -2,7 +2,7 @@
 
 import { deleteClip } from "@/lib/clips/deleteClips";
 import { TClip } from "@/types/clip";
-import Clip from "@/components/Clip";
+import Clip from "@/components/clips/Clip";
 
 type ClipDetailsProps = {
 	clip: TClip;
