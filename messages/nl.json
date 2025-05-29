@@ -22,19 +22,9 @@
 		"yourClips": "Jouw Clips",
 		"noClips": "Je hebt nog geen Clips.",
 		"createClip": "Nieuwe Clip aanmaken",
-		"clipTitle": "Clip Titel",
-		"clipContent": "Clip Inhoud",
-		"submitClip": "Clip Verzenden",
-		"editClip": "Clip Bewerken",
-		"deleteClip": "Clip Verwijderen",
+		"editClip": "Clip bewerken",
+		"deleteClip": "Clip verwijderen",
 		"confirmDelete": "Weet je zeker dat je deze Clip wilt verwijderen?",
-		"clipDeleted": "Clip succesvol verwijderd.",
-		"clipCreated": "Clip succesvol aangemaakt.",
-		"clipUpdated": "Clip succesvol bijgewerkt.",
-		"errorCreatingClip": "Fout bij het aanmaken van de Clip. Probeer het opnieuw.",
-		"errorUpdatingClip": "Fout bij het bijwerken van de Clip. Probeer het opnieuw.",
-		"errorDeletingClip": "Fout bij het verwijderen van de Clip. Probeer het opnieuw.",
-		"errorLoadingClips": "Fout bij het laden van de Clips. Probeer het opnieuw.",
 		"errorFetchingClips": "Fout bij het ophalen van Clips. Probeer het opnieuw.",
 		"noClipsFound": "Geen Clips gevonden voor deze Clip.",
 		"loadingClips": "Jouw Clips worden geladen...",
@@ -50,17 +40,25 @@
 		"delete": "Verwijderen",
 		"posted": "Geplaatst op",
 		"lastUpdated": "Laatst bijgewerkt op",
-		"videoNotSupported": "Je browser ondersteunt de video tag niet.",
+		"videoNotSupported": "Je browser ondersteunt de video-tag niet.",
 		"clipNotFound": "Clip niet gevonden.",
-		"confirmDelete": "Weet je zeker dat je deze Clip wilt verwijderen?"
-	},
-	"CreateClipComponent": {
-		"title": "Titel",
-		"description": "Beschrijving",
-		"uploadClipLabel": "Upload Clip",
-		"loginRequired": "Je moet ingelogd zijn om een Clip aan te maken.",
-		"createClipButton": "Aanmaken",
-		"creatingClip": "Clip wordt aangemaakt..."
+		"confirmDelete": "Weet je zeker dat je deze Clip wilt verwijderen?",
+		"createClip": {
+			"title": "Titel",
+			"description": "Beschrijving",
+			"uploadClipLabel": "Clip uploaden",
+			"loginRequired": "Je moet ingelogd zijn om een Clip aan te maken.",
+			"createClipButton": "Aanmaken",
+			"creatingClip": "Clip wordt aangemaakt..."
+		},
+		"editClip": {
+			"title": "Clip bewerken",
+			"description": "Beschrijving",
+			"updateClipButton": "Bijwerken",
+			"updatingClip": "Clip wordt bijgewerkt...",
+			"videoNotSupported": "Je browser ondersteunt de video-tag niet.",
+			"loginRequired": "Je moet ingelogd zijn om een Clip te bewerken."
+		}
 	},
 	"ReactionBarComponent": {
 		"addReaction": "Reactie toevoegen",

@@ -11,9 +11,10 @@ type Props = {
 	clip: TClip;
 	editable?: boolean;
 	handleDelete?: () => void;
+	session?: any;
 };
 
-export default function ClipClient({ clip, editable, handleDelete }: Props) {
+export default function ClipClient({ clip, editable, handleDelete, session }: Props) {
 	const router = useRouter();
 
 	const goToDetail = () => router.push(`/${clip._id}`);
@@ -104,12 +105,14 @@ export default function ClipClient({ clip, editable, handleDelete }: Props) {
 					>
 						{t("delete")}
 					</button>
-					<Link
-						className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
-						href={`${clip._id}/edit`}
-					>
-						{t("edit")}
-					</Link>
+					{session && session.user?._id === clip.user?._id && (
+						<Link
+							className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
+							href={`${clip._id}/edit`}
+						>
+							{t("edit")}
+						</Link>
+					)}
 				</div>
 			)}
 		</div>

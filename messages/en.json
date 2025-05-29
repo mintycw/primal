@@ -22,19 +22,9 @@
 		"yourClips": "Your Clips",
 		"noClips": "You have no Clips yet.",
 		"createClip": "Create a new Clip",
-		"clipTitle": "Clip Title",
-		"clipContent": "Clip Content",
-		"submitClip": "Submit Clip",
 		"editClip": "Edit Clip",
 		"deleteClip": "Delete Clip",
 		"confirmDelete": "Are you sure you want to delete this Clip?",
-		"clipDeleted": "Clip deleted successfully.",
-		"clipCreated": "Clip created successfully.",
-		"clipUpdated": "Clip updated successfully.",
-		"errorCreatingClip": "Error creating Clip. Please try again.",
-		"errorUpdatingClip": "Error updating Clip. Please try again.",
-		"errorDeletingClip": "Error deleting Clip. Please try again.",
-		"errorLoadingClips": "Error loading Clips. Please try again.",
 		"errorFetchingClips": "Error fetching clips. Please try again.",
 		"noClipsFound": "No clips found for this Clip.",
 		"loadingClips": "Loading your Clips...",
@@ -52,15 +42,23 @@
 		"lastUpdated": "Last updated on",
 		"videoNotSupported": "Your browser doesn't support the video tag.",
 		"clipNotFound": "Clip not found.",
-		"confirmDelete": "Are you sure you want to delete this Clip?"
-	},
-	"CreateClipComponent": {
-		"title": "Title",
-		"description": "Description",
-		"uploadClipLabel": "Upload Clip",
-		"loginRequired": "You must be logged in to create a Clip.",
-		"createClipButton": "Create",
-		"creatingClip": "Creating Clip..."
+		"confirmDelete": "Are you sure you want to delete this Clip?",
+		"createClip": {
+			"title": "Title",
+			"description": "Description",
+			"uploadClipLabel": "Upload Clip",
+			"loginRequired": "You must be logged in to create a Clip.",
+			"createClipButton": "Create",
+			"creatingClip": "Creating Clip..."
+		},
+		"editClip": {
+			"title": "Edit Clip",
+			"description": "Description",
+			"updateClipButton": "Update",
+			"updatingClip": "Updating Clip...",
+			"videoNotSupported": "Your browser doesn't support the video tag.",
+			"loginRequired": "You must be logged in to edit a Clip."
+		}
 	},
 	"ReactionBarComponent": {
 		"addReaction": "Add Reaction",

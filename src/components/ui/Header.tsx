@@ -16,7 +16,9 @@ export default async function Header() {
 				<LanguageSelector />
 			</div>
 			<div className="flex items-center justify-center">
-				<h1>Primal</h1>
+				<Link href={"/"}>
+					<h1>Primal</h1>
+				</Link>
 			</div>
 			<div className="mx-4 flex items-center justify-end gap-4">
 				{session ? (

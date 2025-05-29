@@ -2,9 +2,12 @@ import { getClip } from "@/lib/clips/fetchClips";
 import { TClip } from "@/types/clip";
 import { RouteParams } from "@/types/param";
 import EditClipInfo from "./EditClipInfo";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/authOptions";
 
 export default async function EditClip({ params }: RouteParams<{ clipId: string }>) {
 	const { clipId } = await params;
+	const session = await getServerSession(authOptions);
 
 	if (!clipId) {
 		return <div>Clip ID is missing</div>;
@@ -17,8 +20,8 @@ export default async function EditClip({ params }: RouteParams<{ clipId: string 
 	}
 
 	return (
-		<div>
-			<EditClipInfo id={clip._id} title={clip.title} description={clip.description || ""} />
+		<div className="flex min-h-screen flex-col items-center justify-start gap-4 p-4">
+			<EditClipInfo session={session} clip={clip} />
 		</div>
 	);
 }

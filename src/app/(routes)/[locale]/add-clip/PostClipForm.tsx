@@ -17,7 +17,7 @@ export default function PostClipForm({ session }: { session: any }) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const t = useTranslations("CreateClipComponent");
+	const t = useTranslations("ClipComponent");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -78,7 +78,7 @@ export default function PostClipForm({ session }: { session: any }) {
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
 						required
-						placeholder={t("title")}
+						placeholder={t("createClip.title")}
 						className="w-full rounded-md bg-stone-600 p-2 text-lg font-semibold shadow-lg hover:scale-[1.01]"
 						disabled={loading}
 					/>
@@ -87,7 +87,7 @@ export default function PostClipForm({ session }: { session: any }) {
 					<textarea
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
-						placeholder={t("description")}
+						placeholder={t("createClip.description")}
 						disabled={loading}
 						className="min-h-20 w-full rounded-md bg-stone-600 p-2 text-sm shadow-lg hover:scale-[1.01]"
 					/>
@@ -126,7 +126,7 @@ export default function PostClipForm({ session }: { session: any }) {
 					className="flex h-9 w-24 items-center justify-center truncate rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
 				>
 					<span className="w-full truncate px-1 text-center">
-						{loading ? t("creatingClip") : t("createClipButton")}
+						{loading ? t("createClip.creatingClip") : t("createClip.createClipButton")}
 					</span>
 				</button>
 			</div>
@@ -134,7 +134,7 @@ export default function PostClipForm({ session }: { session: any }) {
 	) : (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
 			<div className="mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl">
-				<h1>{t("loginRequired")}</h1>
+				<h1>{t("createClip.loginRequired")}</h1>
 			</div>
 		</div>
 	);
