@@ -42,7 +42,7 @@ export const getClip = async (id: string): Promise<TClip | null> => {
 
 export const getUserClips = async (id: string): Promise<TClip[]> => {
 	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/${id}`, {
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/clips/user/${id}`, {
 			cache: "no-store",
 			next: { revalidate: 0 },
 		});

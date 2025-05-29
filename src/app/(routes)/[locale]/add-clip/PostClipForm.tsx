@@ -1,23 +1,19 @@
 "use client";
 
-import { putClip } from "@/lib/clips/postClip";
-import { TClip, TClipUpdate } from "@/types/clip";
-import { Session } from "next-auth";
-import { useTranslations } from "next-intl";
-import Image from "next/image";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { postClip } from "@/lib/clips/postClip";
+import Image from "next/image";
+import { useTranslations } from "next-intl";
+import { Session } from "next-auth";
 
-interface EditClipProps {
-	session: Session | null;
-	clip: TClip;
-}
-
-export default function EditClipInfo({ session, clip }: EditClipProps) {
+export default function PostClipForm({ session }: { session: Session | null }) {
 	const router = useRouter();
+	const MAX_FILE_SIZE = 500 * Math.pow(1024, 2); // 500 MB
 
-	const [newTitle, setNewTitle] = useState(clip.title);
-	const [newDescription, setNewDescription] = useState(clip.description);
+	const [title, setTitle] = useState<string>("");
+	const [description, setDescription] = useState<string>("");
+	const [content, setContent] = useState<File | null>(null);
 
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -27,25 +23,28 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!newTitle || !newDescription) {
-			alert("Both title and description are required");
+		if (!title || !content) {
+			alert("Title field and video clip is required");
+			return;
+		}
+		if (content.size > MAX_FILE_SIZE) {
+			alert("File size exceeds the limit of 1 GB. Consider shortening the video.");
 			return;
 		}
 
-		const editClip: TClipUpdate = {
-			title: newTitle,
-			description: newDescription,
-		};
+		const formData = new FormData();
+		formData.append("title", title);
+		formData.append("description", description);
+		formData.append("content", content);
 
 		setLoading(true);
 		setError(null);
 
-		const editedClip = await putClip(clip._id, editClip);
-
-		if (!editedClip) {
-			alert("Failed to update clip. Please try again.");
+		const createdClip = await postClip(formData, content);
+		if (!createdClip) {
+			setError("Failed to create clip. Please try again.");
 		} else {
-			router.push(`/${editedClip._id}`);
+			router.push(`/${createdClip.clipId}`);
 		}
 
 		setLoading(false);
@@ -77,19 +76,19 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 				<div className="mb-2">
 					<input
 						type="text"
-						value={newTitle}
-						onChange={(e) => setNewTitle(e.target.value)}
+						value={title}
+						onChange={(e) => setTitle(e.target.value)}
 						required
-						placeholder={t("editClip.title")}
+						placeholder={t("createClip.title")}
 						className="w-full rounded-md bg-stone-600 p-2 text-lg font-semibold shadow-lg hover:scale-[1.01]"
 						disabled={loading}
 					/>
 				</div>
 				<div>
 					<textarea
-						value={newDescription}
-						onChange={(e) => setNewDescription(e.target.value)}
-						placeholder={t("editClip.description")}
+						value={description}
+						onChange={(e) => setDescription(e.target.value)}
+						placeholder={t("createClip.description")}
 						disabled={loading}
 						className="min-h-20 w-full rounded-md bg-stone-600 p-2 text-sm shadow-lg hover:scale-[1.01]"
 					/>
@@ -97,14 +96,23 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 			</div>
 
 			<div>
-				<video
-					controls
-					onClick={(e) => e.stopPropagation()}
-					className="mb-2 max-w-2xl rounded-md shadow-lg hover:scale-[1.01]"
-				>
-					<source src={clip.videoUrl} type="video/mp4" />
-					{t("videoNotSupported")}
-				</video>
+				<label htmlFor="upload" className="px-2 text-sm font-semibold">
+					{t("createClip.uploadClipLabel")}
+				</label>
+				<input
+					type="file"
+					id="upload"
+					accept="video/*"
+					onChange={(e) => {
+						if (e.target.files && e.target.files[0]) {
+							const file = e.target.files[0];
+							setContent(file);
+						}
+					}}
+					required
+					className="mb-2 flex h-60 max-w-2xl flex-col items-start justify-start rounded-md bg-stone-600 p-4 shadow-lg hover:scale-[1.01]"
+					disabled={loading}
+				/>
 			</div>
 
 			<hr className="my-2 border-t border-stone-400" />
@@ -119,7 +127,7 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 					className="flex h-9 w-24 items-center justify-center truncate rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
 				>
 					<span className="w-full truncate px-1 text-center">
-						{loading ? t("editClip.updatingClip") : t("editClip.updateClipButton")}
+						{loading ? t("createClip.creatingClip") : t("createClip.createClipButton")}
 					</span>
 				</button>
 			</div>
@@ -127,7 +135,7 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 	) : (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
 			<div className="mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl">
-				<h1>{t("editClip.loginRequired")}</h1>
+				<h1>{t("createClip.loginRequired")}</h1>
 			</div>
 		</div>
 	);

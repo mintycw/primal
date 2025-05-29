@@ -1,5 +1,73 @@
 {
+	"HeaderComponent": {
+		"addClipButton": "Clip toevoegen",
+		"profileButton": "Profiel",
+		"logInButton": "Inloggen",
+		"logOutButton": "Uitloggen"
+	},
 	"HomePage": {
 		"main": "Dit is de startpagina van onze applicatie."
+	},
+	"LoginPage": {
+		"login": "Inloggen",
+		"loginButton": "Inloggen",
+		"signInWithGoogle": "Inloggen met Google",
+		"signInWithDiscord": "Inloggen met Discord",
+		"loggedInAs": "Ingelogd als {name}",
+		"logoutButton": "Uitloggen",
+		"home": "Startpagina",
+		"errorLoggingIn": "Er is een fout opgetreden tijdens het inloggen. Probeer het opnieuw."
+	},
+	"UserPage": {
+		"yourClips": "Jouw Clips",
+		"noClips": "Je hebt nog geen Clips.",
+		"createClip": "Nieuwe Clip aanmaken",
+		"editClip": "Clip bewerken",
+		"deleteClip": "Clip verwijderen",
+		"confirmDelete": "Weet je zeker dat je deze Clip wilt verwijderen?",
+		"errorFetchingClips": "Fout bij het ophalen van Clips. Probeer het opnieuw.",
+		"noClipsFound": "Geen Clips gevonden voor deze Clip.",
+		"loadingClips": "Jouw Clips worden geladen...",
+		"usersClip": "Clip van {name}",
+		"userNotFound": "Gebruiker niet gevonden."
+	},
+	"ClipPage": {
+		"pageNotFound": "Pagina niet gevonden.",
+		"clipNotFound": "Clip niet gevonden."
+	},
+	"ClipComponent": {
+		"edit": "Bewerken",
+		"delete": "Verwijderen",
+		"posted": "Geplaatst op",
+		"lastUpdated": "Laatst bijgewerkt op",
+		"videoNotSupported": "Je browser ondersteunt de video-tag niet.",
+		"clipNotFound": "Clip niet gevonden.",
+		"confirmDelete": "Weet je zeker dat je deze Clip wilt verwijderen?",
+		"createClip": {
+			"title": "Titel",
+			"description": "Beschrijving",
+			"uploadClipLabel": "Clip uploaden",
+			"loginRequired": "Je moet ingelogd zijn om een Clip aan te maken.",
+			"createClipButton": "Aanmaken",
+			"creatingClip": "Clip wordt aangemaakt..."
+		},
+		"editClip": {
+			"title": "Clip bewerken",
+			"description": "Beschrijving",
+			"updateClipButton": "Bijwerken",
+			"updatingClip": "Clip wordt bijgewerkt...",
+			"videoNotSupported": "Je browser ondersteunt de video-tag niet.",
+			"loginRequired": "Je moet ingelogd zijn om een Clip te bewerken."
+		}
+	},
+	"ReactionBarComponent": {
+		"addReaction": "Reactie toevoegen",
+		"loading": "Reacties laden..."
+	},
+	"generic": {
+		"languages": {
+			"en": "Engels",
+			"nl": "Nederlands"
+		}
 	}
 }
