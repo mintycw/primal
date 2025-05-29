@@ -88,8 +88,8 @@ export default function PostClipForm({ session }: { session: any }) {
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder={t("description")}
-						className="w-full rounded-md bg-stone-600 p-2 text-sm shadow-lg hover:scale-[1.01]"
 						disabled={loading}
+						className="min-h-20 w-full rounded-md bg-stone-600 p-2 text-sm shadow-lg hover:scale-[1.01]"
 					/>
 				</div>
 			</div>

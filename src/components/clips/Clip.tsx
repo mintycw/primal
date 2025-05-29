@@ -1,4 +1,3 @@
-import { get } from "http";
 import ClipClient from "./ClipClient";
 import { TClip } from "@/types/clip";
 import { useTranslations } from "next-intl";

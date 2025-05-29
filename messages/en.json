@@ -56,7 +56,7 @@
 	},
 	"CreateClipComponent": {
 		"title": "Title",
-		"description": "Ddescription",
+		"description": "Description",
 		"uploadClipLabel": "Upload Clip",
 		"loginRequired": "You must be logged in to create a Clip.",
 		"createClipButton": "Create",
