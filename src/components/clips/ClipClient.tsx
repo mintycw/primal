@@ -6,18 +6,17 @@ import Image from "next/image";
 import ReactionBar from "@/components/ReactionBar";
 import { TClip } from "@/types/clip";
 import { useTranslations } from "next-intl";
-import { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 
 type Props = {
 	clip: TClip;
 	editable?: boolean;
 	handleDelete?: () => void;
-	session?: Session | null;
 };
 
-export default function ClipClient({ clip, editable, handleDelete, session }: Props) {
+export default function ClipClient({ clip, editable, handleDelete }: Props) {
 	const router = useRouter();
-
+	const { data: session, status } = useSession();
 	const goToDetail = () => router.push(`/${clip._id}`);
 
 	const t = useTranslations("ClipComponent");
@@ -98,7 +97,7 @@ export default function ClipClient({ clip, editable, handleDelete, session }: Pr
 
 			<ReactionBar clipId={clip._id} initialReactions={clip.reactions} />
 
-			{editable && (
+			{session && session.user?._id === clip.user?._id && editable && (
 				<div onClick={(e) => e.stopPropagation()} className="mt-2 flex justify-end gap-2">
 					<button
 						onClick={handleDelete}
@@ -106,14 +105,12 @@ export default function ClipClient({ clip, editable, handleDelete, session }: Pr
 					>
 						{t("delete")}
 					</button>
-					{session && session.user?._id === clip.user?._id && (
-						<Link
-							className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
-							href={`${clip._id}/edit`}
-						>
-							{t("edit")}
-						</Link>
-					)}
+					<Link
+						className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
+						href={`${clip._id}/edit`}
+					>
+						{t("edit")}
+					</Link>
 				</div>
 			)}
 		</div>
