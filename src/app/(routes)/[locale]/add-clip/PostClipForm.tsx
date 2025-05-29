@@ -97,7 +97,7 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 
 			<div>
 				<label htmlFor="upload" className="px-2 text-sm font-semibold">
-					{t("uploadClipLabel")}
+					{t("createClip.uploadClipLabel")}
 				</label>
 				<input
 					type="file"
