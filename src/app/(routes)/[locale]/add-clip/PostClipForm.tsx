@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { postClip } from "@/lib/clips/postClip";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { Session } from "next-auth";
 
-export default function PostClipForm({ session }: { session: any }) {
+export default function PostClipForm({ session }: { session: Session | null }) {
 	const router = useRouter();
 	const MAX_FILE_SIZE = 500 * Math.pow(1024, 2); // 500 MB
 

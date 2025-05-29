@@ -6,12 +6,13 @@ import Image from "next/image";
 import ReactionBar from "@/components/ReactionBar";
 import { TClip } from "@/types/clip";
 import { useTranslations } from "next-intl";
+import { Session } from "next-auth";
 
 type Props = {
 	clip: TClip;
 	editable?: boolean;
 	handleDelete?: () => void;
-	session?: any;
+	session?: Session | null;
 };
 
 export default function ClipClient({ clip, editable, handleDelete, session }: Props) {

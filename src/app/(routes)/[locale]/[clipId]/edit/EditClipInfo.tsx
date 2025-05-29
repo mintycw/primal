@@ -2,13 +2,14 @@
 
 import { putClip } from "@/lib/clips/postClip";
 import { TClip, TClipUpdate } from "@/types/clip";
+import { Session } from "next-auth";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface EditClipProps {
-	session: any;
+	session: Session | null;
 	clip: TClip;
 }
 

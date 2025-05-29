@@ -1,19 +1,16 @@
 "use client";
 
-import { deleteClip } from "@/lib/clips/deleteClips";
 import { TClip } from "@/types/clip";
 import Clip from "@/components/clips/Clip";
-import { useTranslations } from "next-intl";
+import deleteClip from "@/lib/clips/deleteClips";
 
 type ClipDetailsProps = {
 	clip: TClip;
 };
 
 export default function ClipDetails({ clip }: ClipDetailsProps) {
-	const t = useTranslations("ClipComponent");
-
 	function handleDelete() {
-		deleteClip(clip._id, t);
+		deleteClip({ id: clip._id });
 	}
 
 	return <Clip clip={clip} handleDelete={handleDelete} />;

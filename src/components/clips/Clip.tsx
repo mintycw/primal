@@ -1,7 +1,6 @@
-import { authOptions } from "@/lib/auth/authOptions";
 import ClipClient from "./ClipClient";
 import { TClip } from "@/types/clip";
-import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 
 type ClipProps = {
@@ -11,7 +10,7 @@ type ClipProps = {
 
 export default function Clip({ clip, handleDelete }: ClipProps) {
 	const t = useTranslations("ClipComponent");
-	const session = getServerSession(authOptions);
+	const { data: session } = useSession();
 	if (!clip) return <div>{t("clipNotFound")}</div>;
 
 	return (

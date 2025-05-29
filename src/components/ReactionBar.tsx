@@ -21,7 +21,7 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 
 	const t = useTranslations("ReactionBarComponent");
 
-	function handleShowEmojiPicker(e: React.MouseEvent<HTMLButtonElement>) {
+	function handleShowEmojiPicker() {
 		setShowEmojiPicker((prev) => !prev);
 	}
 
@@ -73,7 +73,7 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 		hasInitialized,
 	]);
 
-	const handleReaction = async (e: React.MouseEvent<HTMLButtonElement>, emoji: string) => {
+	const handleReaction = async (emoji: string) => {
 		if (!session || !session.user?._id) {
 			// If not logged in, prompt to log in NOTE: This should be handled by the UI later..
 			alert("Please log in to react to clips");
@@ -155,7 +155,7 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 				{reactions.map((reaction) => (
 					<button
 						key={reaction.emoji}
-						onClick={(e) => handleReaction(e, reaction.emoji)}
+						onClick={() => handleReaction(reaction.emoji)}
 						className={`flex items-center rounded-full px-3 py-1 text-sm text-stone-200 shadow duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 ${
 							reaction.hasReacted ? "bg-stone-700" : "bg-stone-800 text-stone-200"
 						}`}
@@ -181,7 +181,7 @@ export default function ReactionBar({ clipId, initialReactions = [] }: ReactionB
 					{COMMON_EMOJIS.map((emoji) => (
 						<button
 							key={emoji}
-							onClick={(e) => handleReaction(e, emoji)}
+							onClick={() => handleReaction(emoji)}
 							className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-transform duration-100 hover:scale-125"
 						>
 							<span className="text-2xl">{emoji}</span>
