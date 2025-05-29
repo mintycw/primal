@@ -16,7 +16,7 @@ type Props = {
 
 export default function ClipClient({ clip, editable, handleDelete }: Props) {
 	const router = useRouter();
-	const { data: session, status } = useSession();
+	const { data: session } = useSession();
 	const goToDetail = () => router.push(`/${clip._id}`);
 
 	const t = useTranslations("ClipComponent");
