@@ -20,7 +20,7 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 
 		return NextResponse.json(user);
 	} catch (error) {
-		console.error("Error fetching user user:", error);
+		console.error("Error fetching user:", error);
 		return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
 	}
 }

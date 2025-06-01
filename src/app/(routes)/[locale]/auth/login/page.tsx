@@ -21,7 +21,7 @@ function Page() {
 	return session ? (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
 			<div className="mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl">
-				<div className="items-star flext mb-4 justify-center">
+				<div className="mb-4 flex items-start justify-center">
 					<h1>
 						{session.user?.name
 							? t("loggedInAs", { name: session.user.name })
