@@ -42,7 +42,7 @@
 		"@types/react-dom": "^19",
 		"@types/testing-library__user-event": "^4.1.1",
 		"aws-sdk-client-mock": "^4.1.0",
-		"babel-jest": "^30.0.0-beta.3",
+		"babel-jest": "^29.7.0",
 		"eslint": "^9",
 		"eslint-config-next": "15.1.6",
 		"eslint-config-prettier": "^10.0.1",
