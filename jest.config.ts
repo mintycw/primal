@@ -10,7 +10,7 @@ const config: Config.InitialOptions = {
 	transform: {
 		"^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
 	},
-	transformIgnorePatterns: ["/node_modules/(?!(next-intl)/)"],
+	transformIgnorePatterns: ["/node_modules/(?!next-intl|use-intl)"],
 	moduleNameMapper: {
 		"^@/(.*)$": "<rootDir>/src/$1",
 	},
