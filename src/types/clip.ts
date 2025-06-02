@@ -8,7 +8,6 @@ export type TClip = {
 	title: string;
 	content?: string;
 	description?: string;
-	uploadUrl?: string;
 	videoUrl: string;
 	objectName: string;
 	reactions?: TReactionCount[];
