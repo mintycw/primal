@@ -6,12 +6,15 @@ const createJestConfig = nextJest({
 });
 
 const config: Config.InitialOptions = {
-	preset: "ts-jest",
 	testEnvironment: "jsdom",
-	setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+	transform: {
+		"^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
+	},
+	transformIgnorePatterns: ["/node_modules/(?!next-intl|use-intl)"],
 	moduleNameMapper: {
 		"^@/(.*)$": "<rootDir>/src/$1",
 	},
+	setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 };
 
 export default createJestConfig(config);
