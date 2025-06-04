@@ -2,7 +2,6 @@ import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import s3 from "@/lib/db/s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
@@ -145,16 +144,15 @@ export async function POST(req: Request) {
 
 		console.log(`Video compression is ${enableCompression ? "enabled" : "disabled"}`);
 
-		let objectName: string; // location and name
+		let objectName: string;
+		let fileBuffer: Buffer;
 
 		if (enableCompression && localCompression) {
 			objectName = `${session.user._id}/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
 
 			// Perform local compression
 			console.log("Compressing video locally...");
-
-			await compressVideoOnNextJS(file);
-
+			fileBuffer = await compressVideoOnNextJS(file);
 			console.log("Video compressed locally.");
 		} else if (enableCompression) {
 			objectName = `${session.user._id}/${Date.now()}-${file.name.replace(path.extname(file.name), ".mp4")}`;
@@ -167,34 +165,36 @@ export async function POST(req: Request) {
 				);
 			}
 
-			// Compress video on endpoint (can be changed to compressVideoOnNextJS but not recommended)
-			await sendEndpointForCompression(file, compressionEndpoint);
-
-			console.log("Video is being compressed...");
+			// Compress video on endpoint
+			console.log("Sending video for compression...");
+			fileBuffer = await sendEndpointForCompression(file, compressionEndpoint);
+			console.log("Video compressed successfully.");
 		} else {
 			// Original video
-			objectName = `${session.user._id}/${Date.now()}-${file.name}`; // Location and name
+			objectName = `${session.user._id}/${Date.now()}-${file.name}`;
+			fileBuffer = Buffer.from(await file.arrayBuffer());
 			console.log("Using original video without compression.");
 		}
 
 		try {
-			// Check S3 bucket is accessibility
+			// Check S3 bucket accessibility
 			const headBucketCommand = new HeadBucketCommand({
 				Bucket: bucketName,
 			});
 
-			// Throws an error if the bucket doesn't exist or is not accessible
 			await s3.send(headBucketCommand);
 			console.log("S3 bucket is accessible");
 
-			// Generates presigned URL for upload
-			const command = new PutObjectCommand({
+			// Upload file directly to S3 (server-side upload)
+			const uploadCommand = new PutObjectCommand({
 				Bucket: bucketName,
 				Key: objectName,
+				Body: fileBuffer,
 				ContentType: file.type,
 			});
 
-			const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // Expires in 1 hour
+			await s3.send(uploadCommand);
+			console.log("File uploaded successfully to S3");
 
 			// Save metadata in MongoDB
 			const newClip = new Clip({
@@ -209,16 +209,16 @@ export async function POST(req: Request) {
 
 			return NextResponse.json(
 				{
-					message: "Clip created successfully",
+					message: "Clip created and uploaded successfully",
 					clipId: savedClip._id,
-					uploadUrl: signedUrl,
+					videoUrl: `${process.env.S3_ENDPOINT}/${bucketName}/${objectName}`,
 				},
 				{ status: 201 }
 			);
 		} catch (s3Error) {
 			console.error("Error accessing S3 bucket:", s3Error);
 			return NextResponse.json(
-				{ error: "Bulk database is currently unavailable. Please try again later." },
+				{ error: "Storage service is currently unavailable. Please try again later." },
 				{ status: 503 }
 			);
 		}
@@ -255,7 +255,7 @@ async function sendEndpointForCompression(
 	}
 }
 
-// Compress the video withtin Next.js (not recommended)
+// Compress the video within Next.js (not recommended)
 async function compressVideoOnNextJS(file: File): Promise<Buffer> {
 	const tempInputPath = path.join("/tmp", file.name);
 	const tempOutputPath = path.join("/tmp", `compressed-${file.name}`);

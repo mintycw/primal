@@ -1,8 +1,8 @@
 "use client";
 
-import { deleteClip } from "@/lib/clips/deleteClips";
 import { TClip } from "@/types/clip";
-import Clip from "@/components/Clip";
+import Clip from "@/components/clips/Clip";
+import deleteClip from "@/lib/clips/deleteClips";
 
 type ClipDetailsProps = {
 	clip: TClip;
@@ -10,7 +10,7 @@ type ClipDetailsProps = {
 
 export default function ClipDetails({ clip }: ClipDetailsProps) {
 	function handleDelete() {
-		deleteClip(clip._id);
+		deleteClip({ id: clip._id });
 	}
 
 	return <Clip clip={clip} handleDelete={handleDelete} />;

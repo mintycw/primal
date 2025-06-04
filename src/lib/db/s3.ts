@@ -21,6 +21,11 @@ if (!process.env.S3_REGION) {
 	console.warn("S3_REGION is not defined. Defaulting to eu-central-1.");
 }
 
+const s3Bucket = process.env.S3_BUCKET;
+if (!s3Bucket) {
+	throw new Error("S3_BUCKET is not defined in environment variables.");
+}
+
 const s3 = new S3({
 	endpoint: s3Endpoint,
 	region: s3Region,
