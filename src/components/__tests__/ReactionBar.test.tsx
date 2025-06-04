@@ -64,11 +64,11 @@ describe("ReactionBar Component", () => {
 
 		// Check if the user's reaction has the correct styling (blue background)
 		const heartButton = screen.getByText("❤️").closest("button");
-		expect(heartButton).toHaveClass("bg-blue-600");
+		expect(heartButton).toHaveClass("bg-stone-700");
 
 		// Check if the non-reacted emoji has the correct styling
 		const fireButton = screen.getByText("🔥").closest("button");
-		expect(fireButton).toHaveClass("bg-gray-800");
+		expect(fireButton).toHaveClass("bg-stone-800");
 	});
 
 	test("toggles reaction when clicked", async () => {
@@ -84,7 +84,7 @@ describe("ReactionBar Component", () => {
 		// Wait for the UI to update
 		await waitFor(() => {
 			// Since we mocked toggleReaction to return 'added', the button should now have the blue background
-			expect(fireButton).toHaveClass("bg-blue-600");
+			expect(fireButton).toHaveClass("bg-stone-700");
 		});
 	});
 

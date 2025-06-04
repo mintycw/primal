@@ -67,8 +67,6 @@ export const authOptions: NextAuthOptions = {
 		async session({ session, token }) {
 			await checkMongodbConnection();
 
-			console.log(session, token);
-
 			// Ensure email and provider exists in session before querying the database
 			if (!session.user?.email || !token.provider) {
 				console.error(

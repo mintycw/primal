@@ -1,11 +1,15 @@
-type TDeleteClip = (id: string) => Promise<void>;
+type TDeleteClip = {
+	id: string;
+};
 
-export const deleteClip: TDeleteClip = async (id) => {
+export default async function deleteClip({ id }: TDeleteClip): Promise<void> {
 	if (!id) {
 		throw new Error("Missing ID parameter");
 	}
 
-	const confirmed = confirm("Are you sure you want to remove this clip?");
+	const confirmed = confirm(
+		"Are you sure you want to delete this clip? This action cannot be undone."
+	);
 
 	if (!confirmed) {
 		return;
@@ -24,4 +28,4 @@ export const deleteClip: TDeleteClip = async (id) => {
 	} catch (error) {
 		console.error("Error deleting clip:", error);
 	}
-};
+}
