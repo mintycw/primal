@@ -34,6 +34,11 @@ const s3 = new S3({
 		secretAccessKey: s3SecretKey,
 	},
 	forcePathStyle: true,
+	requestHandler: {
+		requestTimeout: 300000, // 5 minutes timeout for large uploads
+		connectionTimeout: 60000, // 1 minute connection timeout
+	},
+	maxAttempts: 3, // Retry failed requests up to 3 times
 });
 
 export default s3;

@@ -2,7 +2,13 @@ import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import s3 from "@/lib/db/s3";
-import { PutObjectCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
+import {
+	PutObjectCommand,
+	HeadBucketCommand,
+	CreateMultipartUploadCommand,
+	UploadPartCommand,
+	CompleteMultipartUploadCommand,
+} from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
@@ -177,6 +183,10 @@ export async function POST(req: Request) {
 		}
 
 		try {
+			console.log(`Attempting to access S3 bucket: ${bucketName}`);
+			console.log(`S3 endpoint: ${process.env.S3_ENDPOINT}`);
+			console.log(`S3 region: ${process.env.S3_REGION}`);
+
 			// Check S3 bucket accessibility
 			const headBucketCommand = new HeadBucketCommand({
 				Bucket: bucketName,
@@ -185,15 +195,25 @@ export async function POST(req: Request) {
 			await s3.send(headBucketCommand);
 			console.log("S3 bucket is accessible");
 
-			// Upload file directly to S3 (server-side upload)
-			const uploadCommand = new PutObjectCommand({
-				Bucket: bucketName,
-				Key: objectName,
-				Body: fileBuffer,
-				ContentType: file.type,
-			});
+			console.log(`Uploading file: ${objectName}, size: ${fileBuffer.length} bytes`);
 
-			await s3.send(uploadCommand);
+			// Use multipart upload for files larger than 100MB
+			const fileSizeMB = fileBuffer.length / (1024 * 1024);
+			if (fileSizeMB > 100) {
+				console.log(`File is ${fileSizeMB.toFixed(2)}MB, using multipart upload`);
+				await uploadLargeFileToS3(bucketName, objectName, fileBuffer, file.type);
+			} else {
+				console.log(`File is ${fileSizeMB.toFixed(2)}MB, using standard upload`);
+				// Upload file directly to S3 (server-side upload)
+				const uploadCommand = new PutObjectCommand({
+					Bucket: bucketName,
+					Key: objectName,
+					Body: fileBuffer,
+					ContentType: file.type,
+				});
+
+				await s3.send(uploadCommand);
+			}
 			console.log("File uploaded successfully to S3");
 
 			// Save metadata in MongoDB
@@ -215,8 +235,32 @@ export async function POST(req: Request) {
 				},
 				{ status: 201 }
 			);
-		} catch (s3Error) {
+		} catch (s3Error: any) {
 			console.error("Error accessing S3 bucket:", s3Error);
+
+			// Log more detailed error information
+			if (s3Error.$response) {
+				console.error("S3 Response status:", s3Error.$response.statusCode);
+				console.error("S3 Response headers:", s3Error.$response.headers);
+			}
+
+			if (s3Error.message) {
+				console.error("S3 Error message:", s3Error.message);
+			}
+
+			// Check if this is an HTML response (indicating MinIO is down or misconfigured)
+			if (s3Error.message && s3Error.message.includes("Expected closing tag")) {
+				console.error(
+					"S3/MinIO service appears to be returning HTML instead of S3 responses. Check service status and configuration."
+				);
+				return NextResponse.json(
+					{
+						error: "Storage service is misconfigured or unavailable. Please contact support.",
+					},
+					{ status: 503 }
+				);
+			}
+
 			return NextResponse.json(
 				{ error: "Storage service is currently unavailable. Please try again later." },
 				{ status: 503 }
@@ -233,25 +277,131 @@ async function sendEndpointForCompression(
 	compressionEndpoint: string
 ): Promise<Buffer> {
 	try {
-		const form = new FormData();
+		console.log(
+			`Sending file to compression server: ${file.name}, size: ${file.size} bytes (${(file.size / 1024 / 1024).toFixed(2)} MB)`
+		);
 
+		const form = new FormData();
 		form.append("video", new Blob([await file.arrayBuffer()]), file.name);
+
+		console.log(`Making request to: ${compressionEndpoint}/compress`);
 
 		const response = await fetch(`${compressionEndpoint}/compress`, {
 			method: "POST",
 			body: form,
+			headers: {
+				// Don't set Content-Type, let the browser set it with boundary for multipart/form-data
+			},
 		});
 
+		console.log(
+			`Compression server response status: ${response.status} ${response.statusText}`
+		);
+
 		if (!response.ok) {
-			throw new Error(
-				`Compression server returned ${response.status}: ${response.statusText}`
-			);
+			// Try to get more details about the error
+			let errorDetails = response.statusText;
+			try {
+				const errorText = await response.text();
+				if (errorText) {
+					errorDetails = errorText;
+				}
+			} catch (e) {
+				// Ignore if we can't read the response body
+			}
+
+			throw new Error(`Compression server returned ${response.status}: ${errorDetails}`);
 		}
 
+		console.log("Successfully received compressed video from server");
 		return Buffer.from(await response.arrayBuffer());
 	} catch (error) {
 		console.error("Error sending video to compression server:", error);
 		throw new Error("Failed to compress video on compression server.");
+	}
+}
+
+// Upload large files using multipart upload
+async function uploadLargeFileToS3(
+	bucketName: string,
+	objectName: string,
+	fileBuffer: Buffer,
+	contentType: string
+): Promise<void> {
+	const partSize = 100 * 1024 * 1024; // 100MB per part
+	const parts: { ETag: string; PartNumber: number }[] = [];
+
+	// Create multipart upload
+	const createCommand = new CreateMultipartUploadCommand({
+		Bucket: bucketName,
+		Key: objectName,
+		ContentType: contentType,
+	});
+
+	const createResult = await s3.send(createCommand);
+	const uploadId = createResult.UploadId;
+
+	if (!uploadId) {
+		throw new Error("Failed to create multipart upload");
+	}
+
+	try {
+		// Upload parts
+		const totalParts = Math.ceil(fileBuffer.length / partSize);
+		console.log(`Uploading ${totalParts} parts for multipart upload`);
+
+		for (let i = 0; i < totalParts; i++) {
+			const start = i * partSize;
+			const end = Math.min(start + partSize, fileBuffer.length);
+			const partBuffer = fileBuffer.slice(start, end);
+
+			console.log(`Uploading part ${i + 1}/${totalParts} (${partBuffer.length} bytes)`);
+
+			const uploadPartCommand = new UploadPartCommand({
+				Bucket: bucketName,
+				Key: objectName,
+				PartNumber: i + 1,
+				UploadId: uploadId,
+				Body: partBuffer,
+			});
+
+			const partResult = await s3.send(uploadPartCommand);
+
+			if (partResult.ETag) {
+				parts.push({
+					ETag: partResult.ETag,
+					PartNumber: i + 1,
+				});
+			}
+		}
+
+		// Complete multipart upload
+		const completeCommand = new CompleteMultipartUploadCommand({
+			Bucket: bucketName,
+			Key: objectName,
+			UploadId: uploadId,
+			MultipartUpload: {
+				Parts: parts,
+			},
+		});
+
+		await s3.send(completeCommand);
+		console.log("Multipart upload completed successfully");
+	} catch (error) {
+		// If anything fails, abort the multipart upload
+		console.error("Multipart upload failed, aborting:", error);
+		try {
+			const { AbortMultipartUploadCommand } = await import("@aws-sdk/client-s3");
+			const abortCommand = new AbortMultipartUploadCommand({
+				Bucket: bucketName,
+				Key: objectName,
+				UploadId: uploadId,
+			});
+			await s3.send(abortCommand);
+		} catch (abortError) {
+			console.error("Failed to abort multipart upload:", abortError);
+		}
+		throw error;
 	}
 }
 

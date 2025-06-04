@@ -5,7 +5,41 @@ import fs from "fs";
 import path from "path";
 
 const app = express();
-app.use(fileUpload());
+
+// Increase payload size limits for Express
+app.use(express.json({ limit: "1gb" }));
+app.use(express.urlencoded({ limit: "1gb", extended: true }));
+
+// Configure file upload with proper size limits (1GB)
+app.use(
+	fileUpload({
+		limits: {
+			fileSize: 1024 * 1024 * 1024, // 1GB limit
+			files: 1, // Only allow 1 file at a time
+		},
+		useTempFiles: true,
+		tempFileDir: "/tmp/",
+		createParentPath: true,
+		abortOnLimit: false, // Don't abort on limit, let us handle the error
+		responseOnLimit: "File size limit exceeded. Maximum file size is 1GB.",
+		uploadTimeout: 0, // No timeout for uploads
+	})
+);
+
+// Add CORS headers
+app.use((req, res, next) => {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+	res.header(
+		"Access-Control-Allow-Headers",
+		"Origin, X-Requested-With, Content-Type, Accept, Authorization"
+	);
+	if (req.method === "OPTIONS") {
+		res.sendStatus(200);
+	} else {
+		next();
+	}
+});
 
 const COMPRESSION_SETTINGS = {
 	codec: "hevc_nvenc",
@@ -61,12 +95,6 @@ app.post("/compress", (req, res) => {
 		})
 		.run();
 });
-
-app.use(
-	fileUpload({
-		limits: { fileSize: 1024 * 1024 * 1024 },
-	})
-);
 
 app.listen(3000, () => {
 	console.log("Compression service running on port 3000");
