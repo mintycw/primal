@@ -26,6 +26,14 @@ export const config = {
 	},
 };
 
+type TS3Error = {
+	$response?: {
+		statusCode: number;
+		headers: Record<string, string>;
+	};
+	message?: string;
+};
+
 export async function GET() {
 	try {
 		await checkMongodbConnection();
@@ -235,21 +243,22 @@ export async function POST(req: Request) {
 				},
 				{ status: 201 }
 			);
-		} catch (s3Error: any) {
+		} catch (s3Error: unknown) {
 			console.error("Error accessing S3 bucket:", s3Error);
 
 			// Log more detailed error information
-			if (s3Error.$response) {
-				console.error("S3 Response status:", s3Error.$response.statusCode);
-				console.error("S3 Response headers:", s3Error.$response.headers);
+			const err = s3Error as TS3Error;
+			if (err?.$response) {
+				console.error("S3 Response status:", err.$response.statusCode);
+				console.error("S3 Response headers:", err.$response.headers);
 			}
 
-			if (s3Error.message) {
-				console.error("S3 Error message:", s3Error.message);
+			if (err?.message) {
+				console.error("S3 Error message:", err.message);
 			}
 
 			// Check if this is an HTML response (indicating MinIO is down or misconfigured)
-			if (s3Error.message && s3Error.message.includes("Expected closing tag")) {
+			if (err?.message && err.message.includes("Expected closing tag")) {
 				console.error(
 					"S3/MinIO service appears to be returning HTML instead of S3 responses. Check service status and configuration."
 				);
@@ -307,7 +316,7 @@ async function sendEndpointForCompression(
 					errorDetails = errorText;
 				}
 			} catch (e) {
-				// Ignore if we can't read the response body
+				console.error("Failed to read error response body:", e);
 			}
 
 			throw new Error(`Compression server returned ${response.status}: ${errorDetails}`);
