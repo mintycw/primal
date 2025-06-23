@@ -2,13 +2,7 @@ import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
 import s3 from "@/lib/db/s3";
-import {
-	PutObjectCommand,
-	HeadBucketCommand,
-	CreateMultipartUploadCommand,
-	UploadPartCommand,
-	CompleteMultipartUploadCommand,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
@@ -23,14 +17,6 @@ export const config = {
 			sizeLimit: "80mb",
 		},
 	},
-};
-
-type TS3Error = {
-	$response?: {
-		statusCode: number;
-		headers: Record<string, string>;
-	};
-	message?: string;
 };
 
 export async function GET() {
