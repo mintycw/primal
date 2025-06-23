@@ -26,6 +26,14 @@ export const config = {
 	},
 };
 
+type TS3Error = {
+	$response?: {
+		statusCode: number;
+		headers: Record<string, string>;
+	};
+	message?: string;
+};
+
 export async function GET() {
 	try {
 		await checkMongodbConnection();
