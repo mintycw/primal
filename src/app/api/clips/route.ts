@@ -17,11 +17,10 @@ import { getServerSession } from "next-auth";
 import { TReactionCount } from "@/types/reaction";
 import { IReaction } from "@/models/Reaction";
 
-// Does not have to be changed unless we go beyond 1GB
 export const config = {
 	api: {
 		bodyParser: {
-			sizeLimit: "1024mb",
+			sizeLimit: "80mb",
 		},
 	},
 };
@@ -138,6 +137,15 @@ export async function POST(req: Request) {
 		const description = formData.get("description") as string | null;
 		const file = formData.get("content") as File;
 
+		// File size limit check
+		const maxFileSizeBytes = 80 * 1024 * 1024; // 80MB
+		if (file && file.size > maxFileSizeBytes) {
+			return NextResponse.json(
+				{ error: "Video file exceeds maximum size of 80MB." },
+				{ status: 400 }
+			);
+		}
+
 		const bucketName = process.env.S3_BUCKET;
 		const enableCompression = process.env.VIDEO_COMPRESSION === "true";
 		const localCompression = process.env.LOCAL_VIDEO_COMPRESSION === "true";
@@ -205,23 +213,15 @@ export async function POST(req: Request) {
 
 			console.log(`Uploading file: ${objectName}, size: ${fileBuffer.length} bytes`);
 
-			// Use multipart upload for files larger than 100MB
-			const fileSizeMB = fileBuffer.length / (1024 * 1024);
-			if (fileSizeMB > 100) {
-				console.log(`File is ${fileSizeMB.toFixed(2)}MB, using multipart upload`);
-				await uploadLargeFileToS3(bucketName, objectName, fileBuffer, file.type);
-			} else {
-				console.log(`File is ${fileSizeMB.toFixed(2)}MB, using standard upload`);
-				// Upload file directly to S3 (server-side upload)
-				const uploadCommand = new PutObjectCommand({
-					Bucket: bucketName,
-					Key: objectName,
-					Body: fileBuffer,
-					ContentType: file.type,
-				});
+			// Upload file directly to S3 (server-side upload)
+			const uploadCommand = new PutObjectCommand({
+				Bucket: bucketName,
+				Key: objectName,
+				Body: fileBuffer,
+				ContentType: file.type,
+			});
 
-				await s3.send(uploadCommand);
-			}
+			await s3.send(uploadCommand);
 			console.log("File uploaded successfully to S3");
 
 			// Save metadata in MongoDB
@@ -334,90 +334,6 @@ async function sendEndpointForCompression(
 	} catch (error) {
 		console.error("Error sending video to compression server:", error);
 		throw new Error("Failed to compress video on compression server.");
-	}
-}
-
-// Upload large files using multipart upload
-async function uploadLargeFileToS3(
-	bucketName: string,
-	objectName: string,
-	fileBuffer: Buffer,
-	contentType: string
-): Promise<void> {
-	const partSize = 100 * 1024 * 1024; // 100MB per part
-	const parts: { ETag: string; PartNumber: number }[] = [];
-
-	// Create multipart upload
-	const createCommand = new CreateMultipartUploadCommand({
-		Bucket: bucketName,
-		Key: objectName,
-		ContentType: contentType,
-	});
-
-	const createResult = await s3.send(createCommand);
-	const uploadId = createResult.UploadId;
-
-	if (!uploadId) {
-		throw new Error("Failed to create multipart upload");
-	}
-
-	try {
-		// Upload parts
-		const totalParts = Math.ceil(fileBuffer.length / partSize);
-		console.log(`Uploading ${totalParts} parts for multipart upload`);
-
-		for (let i = 0; i < totalParts; i++) {
-			const start = i * partSize;
-			const end = Math.min(start + partSize, fileBuffer.length);
-			const partBuffer = fileBuffer.slice(start, end);
-
-			console.log(`Uploading part ${i + 1}/${totalParts} (${partBuffer.length} bytes)`);
-
-			const uploadPartCommand = new UploadPartCommand({
-				Bucket: bucketName,
-				Key: objectName,
-				PartNumber: i + 1,
-				UploadId: uploadId,
-				Body: partBuffer,
-			});
-
-			const partResult = await s3.send(uploadPartCommand);
-
-			if (partResult.ETag) {
-				parts.push({
-					ETag: partResult.ETag,
-					PartNumber: i + 1,
-				});
-			}
-		}
-
-		// Complete multipart upload
-		const completeCommand = new CompleteMultipartUploadCommand({
-			Bucket: bucketName,
-			Key: objectName,
-			UploadId: uploadId,
-			MultipartUpload: {
-				Parts: parts,
-			},
-		});
-
-		await s3.send(completeCommand);
-		console.log("Multipart upload completed successfully");
-	} catch (error) {
-		// If anything fails, abort the multipart upload
-		console.error("Multipart upload failed, aborting:", error);
-		try {
-			const { AbortMultipartUploadCommand } = await import("@aws-sdk/client-s3");
-			const abortCommand = new AbortMultipartUploadCommand({
-				Bucket: bucketName,
-				Key: objectName,
-				UploadId: uploadId,
-			});
-			await s3.send(abortCommand);
-		} catch (abortError) {
-			console.error("Failed to abort multipart upload:", abortError);
-		}
-		throw error;
 	}
 }
 

@@ -64,7 +64,10 @@ app.post("/compress", (req, res) => {
 	);
 
 	// Save uploaded file to temp location
-	fs.writeFileSync(tempInputPath, video.data);
+	fs.copyFileSync(video.tempFilePath, tempInputPath);
+
+	console.log("video.data length:", video.data?.length);
+	console.log("video.tempFilePath:", video.tempFilePath);
 
 	// Compress video using GPU
 	ffmpeg(tempInputPath)

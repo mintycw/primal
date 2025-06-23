@@ -9,7 +9,7 @@ import { Session } from "next-auth";
 
 export default function PostClipForm({ session }: { session: Session | null }) {
 	const router = useRouter();
-	const MAX_FILE_SIZE = 500 * Math.pow(1024, 2); // 500 MB
+	const MAX_FILE_SIZE = 80 * 1024 * 1024; // 80 MB
 
 	const [title, setTitle] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
@@ -28,7 +28,7 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 			return;
 		}
 		if (content.size > MAX_FILE_SIZE) {
-			alert("File size exceeds the limit of 1 GB. Consider shortening the video.");
+			alert("File size exceeds the limit of 80mb. Consider shortening the video.");
 			return;
 		}
 
