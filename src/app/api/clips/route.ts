@@ -235,30 +235,37 @@ export async function POST(req: Request) {
 				},
 				{ status: 201 }
 			);
-		} catch (s3Error: any) {
+		} catch (s3Error: unknown) {
 			console.error("Error accessing S3 bucket:", s3Error);
 
-			// Log more detailed error information
-			if (s3Error.$response) {
-				console.error("S3 Response status:", s3Error.$response.statusCode);
-				console.error("S3 Response headers:", s3Error.$response.headers);
+			if (typeof s3Error === "object" && s3Error !== null && "$response" in s3Error) {
+				const response = (
+					s3Error as {
+						$response: {
+							statusCode: number;
+							headers: Record<string, string>;
+						};
+					}
+				).$response;
+				console.error("S3 Response status:", response.statusCode);
+				console.error("S3 Response headers:", response.headers);
 			}
 
-			if (s3Error.message) {
-				console.error("S3 Error message:", s3Error.message);
-			}
+			if (typeof s3Error === "object" && s3Error !== null && "message" in s3Error) {
+				const message = (s3Error as { message: string }).message;
+				console.error("S3 Error message:", message);
 
-			// Check if this is an HTML response (indicating MinIO is down or misconfigured)
-			if (s3Error.message && s3Error.message.includes("Expected closing tag")) {
-				console.error(
-					"S3/MinIO service appears to be returning HTML instead of S3 responses. Check service status and configuration."
-				);
-				return NextResponse.json(
-					{
-						error: "Storage service is misconfigured or unavailable. Please contact support.",
-					},
-					{ status: 503 }
-				);
+				if (message.includes("Expected closing tag")) {
+					console.error(
+						"S3/MinIO service appears to be returning HTML instead of S3 responses. Check service status and configuration."
+					);
+					return NextResponse.json(
+						{
+							error: "Storage service is misconfigured or unavailable. Please contact support.",
+						},
+						{ status: 503 }
+					);
+				}
 			}
 
 			return NextResponse.json(
@@ -308,6 +315,7 @@ async function sendEndpointForCompression(
 				}
 			} catch (e) {
 				// Ignore if we can't read the response body
+				console.error("Failed to read error response body:", e);
 			}
 
 			throw new Error(`Compression server returned ${response.status}: ${errorDetails}`);
