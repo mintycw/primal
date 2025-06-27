@@ -1,3 +1,4 @@
+import redis from "@/lib/db/redis";
 import { checkMongodbConnection } from "@/lib/db/checkMongodbConnection";
 import { Clip } from "@/models/Clip";
 import { NextResponse } from "next/server";
@@ -21,6 +22,13 @@ export const config = {
 
 export async function GET() {
 	try {
+		const cacheKey = "clips:all";
+		const cachedClips = await redis.get(cacheKey);
+		if (cachedClips) {
+			console.log("Returning cached clips");
+			return NextResponse.json(JSON.parse(cachedClips));
+		}
+
 		await checkMongodbConnection();
 
 		const clips = await Clip.find().sort({ createdAt: -1 }).populate("user", "name image");
@@ -101,6 +109,8 @@ export async function GET() {
 				reactions: reactionCountsArray,
 			};
 		});
+
+		await redis.setex(cacheKey, 300, JSON.stringify(clipsWithData)); // TTL: 5 min. Later we can use cache strategies like trending etc.
 
 		return NextResponse.json(clipsWithData);
 	} catch (error: unknown) {
@@ -220,6 +230,8 @@ export async function POST(req: Request) {
 			});
 
 			const savedClip = await newClip.save();
+
+			await redis.del("clips:all");
 
 			return NextResponse.json(
 				{

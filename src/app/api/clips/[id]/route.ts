@@ -7,6 +7,7 @@ import s3 from "@/lib/db/s3";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
 import { TReactionCount } from "@/types/reaction";
+import redis from "@/lib/db/redis";
 
 export async function PUT(req: Request, { params }: RouteParams<{ id: string }>) {
 	try {
@@ -31,6 +32,7 @@ export async function PUT(req: Request, { params }: RouteParams<{ id: string }>)
 		}
 
 		await Clip.findByIdAndUpdate(id, { title, description });
+		await redis.del(`clip:${id}`);
 
 		return NextResponse.json(clip, { status: 200 });
 	} catch (error: unknown) {
@@ -45,6 +47,12 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 		await checkMongodbConnection();
 
 		const { id } = await params;
+
+		const cacheKey = `clip:${id}`;
+		const cached = await redis.get(cacheKey);
+		if (cached) {
+			return NextResponse.json({ clip: JSON.parse(cached) }, { status: 200 });
+		}
 
 		if (!id) {
 			return NextResponse.json({ error: "Missing ID parameter" }, { status: 400 });
@@ -102,6 +110,8 @@ export async function GET(req: Request, { params }: RouteParams<{ id: string }>)
 			reactions: reactionCounts,
 		};
 
+		await redis.setex(cacheKey, 300, JSON.stringify(clipWithReactions)); // TTL: 5 min. Later we can use cache strategies like trending etc.
+
 		return NextResponse.json({ clip: clipWithReactions }, { status: 200 });
 	} catch (error: unknown) {
 		console.error(error);
@@ -142,6 +152,7 @@ export async function DELETE(req: Request, { params }: RouteParams<{ id: string 
 
 		// Now delete the clip document from MongoDB
 		await Clip.findByIdAndDelete(id);
+		await redis.del(`clip:${id}`);
 
 		return NextResponse.json({ message: "Clip deleted" }, { status: 200 });
 	} catch (error: unknown) {
