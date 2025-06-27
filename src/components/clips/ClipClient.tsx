@@ -80,7 +80,8 @@ export default function ClipClient({ clip, editable, handleDelete }: Props) {
 				onClick={(e) => e.stopPropagation()}
 				className="mb-2 max-w-2xl rounded-md shadow-lg hover:scale-[1.01]"
 			>
-				<source src={clip.videoUrl} type="video/mp4" />
+				{/* this will make cloudflare think the video is always a new one (disable caching) */}
+				<source src={`${clip.videoUrl}?v=${clip.updatedAt}`} type="video/mp4" />
 				{t("videoNotSupported")}
 			</video>
 
