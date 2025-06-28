@@ -50,6 +50,9 @@ jobs:
                   echo "DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}" >> $GITHUB_ENV
                   echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> $GITHUB_ENV
                   echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> $GITHUB_ENV
+                  echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> $GITHUB_ENV
+                  echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> $GITHUB_ENV
+                  echo "REDIS_PASS=${{ secrets.REDIS_PASS }}" >> $GITHUB_ENV
 
             - name: Run tests
               run: npm test
