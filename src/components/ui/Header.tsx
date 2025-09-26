@@ -25,7 +25,7 @@ export default async function Header() {
 					<>
 						<Link
 							href="/add-clip"
-							className="flex h-10 w-24 items-center justify-center truncate rounded-sm bg-stone-500 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
+							className="flex h-10 w-24 items-center justify-center truncate rounded-sm bg-stone-400 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
 						>
 							<span className="w-full truncate px-1 text-center">
 								{t("addClipButton")}
@@ -33,7 +33,7 @@ export default async function Header() {
 						</Link>
 						<Link
 							href={`/user/${session.user?._id}`}
-							className="flex h-10 w-24 items-center justify-start truncate rounded-sm bg-stone-500 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
+							className="flex h-10 w-24 items-center justify-start truncate rounded-sm bg-stone-400 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
 						>
 							<span className="w-full truncate px-1 text-center">
 								{t("profileButton")}
@@ -44,7 +44,7 @@ export default async function Header() {
 				) : (
 					<Link
 						href="/auth/login"
-						className="flex h-10 w-24 items-center justify-start truncate rounded-sm bg-stone-500 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
+						className="flex h-10 w-24 items-center justify-start truncate rounded-sm bg-stone-400 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
 					>
 						<span className="w-full truncate text-center">{t("logInButton")}</span>
 					</Link>

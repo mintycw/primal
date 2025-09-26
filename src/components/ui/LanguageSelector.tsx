@@ -42,7 +42,7 @@ export default function LanguageSelector() {
 					onClick={() => {
 						setOpenLanguageSelection(!openLanguageSelection);
 					}}
-					className="z-10 flex size-10 items-center justify-center rounded-sm bg-stone-500 p-1 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
+					className="z-10 flex size-10 items-center justify-center rounded-sm bg-stone-400 p-1 font-semibold duration-300 ease-in-out hover:cursor-pointer hover:shadow-lg hover:brightness-90 active:scale-95 active:brightness-75"
 				>
 					<IoLanguage className="size-full" />
 				</button>

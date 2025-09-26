@@ -53,7 +53,7 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 	return session ? (
 		<form
 			onSubmit={handleSubmit}
-			className={`mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl`}
+			className={`mb-4 rounded bg-stone-400 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl`}
 		>
 			<div className="flex items-center">
 				<div className="relative mr-2 size-12 cursor-pointer p-1">
@@ -80,7 +80,7 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 						onChange={(e) => setTitle(e.target.value)}
 						required
 						placeholder={t("createClip.title")}
-						className="w-full rounded-md bg-stone-600 p-2 text-lg font-semibold shadow-lg hover:scale-[1.01]"
+						className="w-full rounded-md bg-stone-500 p-2 text-lg font-semibold shadow-lg hover:scale-[1.01]"
 						disabled={loading}
 					/>
 				</div>
@@ -90,7 +90,7 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder={t("createClip.description")}
 						disabled={loading}
-						className="min-h-20 w-full rounded-md bg-stone-600 p-2 text-sm shadow-lg hover:scale-[1.01]"
+						className="min-h-20 w-full rounded-md bg-stone-500 p-2 text-sm shadow-lg hover:scale-[1.01]"
 					/>
 				</div>
 			</div>
@@ -110,12 +110,10 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 						}
 					}}
 					required
-					className="mb-2 flex h-60 max-w-2xl flex-col items-start justify-start rounded-md bg-stone-600 p-4 shadow-lg hover:scale-[1.01]"
+					className="mb-2 flex h-60 max-w-2xl flex-col items-start justify-start rounded-md bg-stone-500 p-4 shadow-lg hover:scale-[1.01] hover:cursor-pointer hover:border-2 hover:border-stone-600"
 					disabled={loading}
 				/>
 			</div>
-
-			<hr className="my-2 border-t border-stone-400" />
 
 			<div className="mt-2 flex justify-end gap-2">
 				<p className="flex items-center justify-center text-sm">
@@ -124,7 +122,7 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 				<button
 					type="submit"
 					disabled={loading}
-					className="flex h-9 w-24 items-center justify-center truncate rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
+					className="flex h-9 w-24 items-center justify-center truncate rounded-sm border-2 border-green-600 bg-stone-400 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
 				>
 					<span className="w-full truncate px-1 text-center">
 						{loading ? t("createClip.creatingClip") : t("createClip.createClipButton")}
@@ -134,7 +132,7 @@ export default function PostClipForm({ session }: { session: Session | null }) {
 		</form>
 	) : (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
-			<div className="mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl">
+			<div className="mb-4 rounded bg-stone-400 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl">
 				<h1>{t("createClip.loginRequired")}</h1>
 			</div>
 		</div>

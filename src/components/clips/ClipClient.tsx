@@ -46,7 +46,7 @@ export default function ClipClient({ clip, editable, handleDelete }: Props) {
 	return (
 		<div
 			onClick={!editable ? goToDetail : undefined}
-			className={`mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl ${
+			className={`mb-4 rounded bg-stone-400 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl ${
 				!editable ? "cursor-pointer" : ""
 			}`}
 		>
@@ -102,12 +102,12 @@ export default function ClipClient({ clip, editable, handleDelete }: Props) {
 				<div onClick={(e) => e.stopPropagation()} className="mt-2 flex justify-end gap-2">
 					<button
 						onClick={handleDelete}
-						className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-red-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
+						className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-red-600 bg-stone-400 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
 					>
 						{t("delete")}
 					</button>
 					<Link
-						className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
+						className="flex h-9 w-24 items-center justify-center rounded-sm border-2 border-green-600 bg-stone-400 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
 						href={`${clip._id}/edit`}
 					>
 						{t("edit")}

@@ -54,7 +54,7 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 	return session ? (
 		<form
 			onSubmit={handleSubmit}
-			className={`mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl`}
+			className={`mb-4 rounded bg-stone-400 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl`}
 		>
 			<div className="flex items-center">
 				<div className="relative mr-2 size-12 cursor-pointer p-1">
@@ -81,7 +81,7 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 						onChange={(e) => setNewTitle(e.target.value)}
 						required
 						placeholder={t("editClip.title")}
-						className="w-full rounded-md bg-stone-600 p-2 text-lg font-semibold shadow-lg hover:scale-[1.01]"
+						className="w-full rounded-md bg-stone-500 p-2 text-lg font-semibold shadow-lg hover:scale-[1.01]"
 						disabled={loading}
 					/>
 				</div>
@@ -91,7 +91,7 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 						onChange={(e) => setNewDescription(e.target.value)}
 						placeholder={t("editClip.description")}
 						disabled={loading}
-						className="min-h-20 w-full rounded-md bg-stone-600 p-2 text-sm shadow-lg hover:scale-[1.01]"
+						className="min-h-20 w-full rounded-md bg-stone-500 p-2 text-sm shadow-lg hover:scale-[1.01]"
 					/>
 				</div>
 			</div>
@@ -116,7 +116,7 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 				<button
 					type="submit"
 					disabled={loading}
-					className="flex h-9 w-24 items-center justify-center truncate rounded-sm border-2 border-green-600 bg-stone-500 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
+					className="flex h-9 w-24 items-center justify-center truncate rounded-sm border-2 border-green-600 bg-stone-400 font-semibold shadow duration-300 hover:border-4 hover:shadow-lg hover:brightness-90"
 				>
 					<span className="w-full truncate px-1 text-center">
 						{loading ? t("editClip.updatingClip") : t("editClip.updateClipButton")}
@@ -126,7 +126,7 @@ export default function EditClipInfo({ session, clip }: EditClipProps) {
 		</form>
 	) : (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
-			<div className="mb-4 rounded bg-stone-500 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl">
+			<div className="mb-4 rounded bg-stone-400 p-2 shadow-lg duration-300 ease-in-out last:mb-0 hover:shadow-xl">
 				<h1>{t("editClip.loginRequired")}</h1>
 			</div>
 		</div>
