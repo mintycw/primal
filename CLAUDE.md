@@ -11,7 +11,7 @@ The Project is called Primal, its a social media platform for sharing gaming cli
 
 # Technology Stack
 
-- Frontend: Next.js 15, React 19, Tailwind
+- Frontend: Next.js 15.5.4, React 19, Tailwind
 - Backend: Next.js API routes with MongoDB/Mongoose
 - Metadata is saved in MongoDB such as User, Clip and Reactions
 - Authentication: NextAuth with Google and Discord OAuth
